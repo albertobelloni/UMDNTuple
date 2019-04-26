@@ -21,19 +21,24 @@ opt.inputFiles = [
     #'file:/afs/cern.ch/work/y/yofeng/public/WGamma/SignalMiniAOD/FEAAD8B5-E7FC-E611-81C1-008CFA197B74.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2016B/SingleMuon/MINIAOD/07Aug17_ver1-v1/70000/F8E02A2B-0E7F-E711-BC53-0CC47A4D761A.root', #rereco legacy16 @ Aug17
     #'/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/90000/FE8A7852-66E4-E611-B5D0-002590E7E01A.root', # DY MC 2016
-    #'/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/40000/B4C84D02-5242-E811-AA60-008CFA197A60.root', # DY MC 2017
+
+	#'/store/data/Run2016H/SingleElectron/MINIAOD/17Jul2018-v1/00000/582D84C6-EB8B-E811-8313-0025905B861C.root', ##SingleElectron2016H re-miniaod
+	'file:/eos/cms/store/user/kawong/582D84C6-EB8B-E811-8313-0025905B861C.root', ##SingleElectron2016H re-miniaod
+
+	#'/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/100000/0C2AEF4D-1FBF-E811-A04F-B496910A80F4.root', ##2016 DY MC re-miniaod (v3)
+	#'file:/eos/cms/store/user/kawong/0C2AEF4D-1FBF-E811-A04F-B496910A80F4.root', ##2016 DY MC re-miniaod (v3)
+
     #'/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/40000/04F71189-4742-E811-AA48-008CFAC9157C.root',
-    #'file:/afs/cern.ch/user/k/kawong/UMDNTuple/CMSSW_9_4_9_cand2/src/UMDNTuple/UMDNTuple/04F71189-4742-E811-AA48-008CFAC9157C.root',
-    'file:/eos/cms/store/user/kawong/40BCA89D-2C38-E811-9682-008CFAC93CF8.root',
+    'file:/eos/cms/store/user/kawong/04F71189-4742-E811-AA48-008CFAC9157C.root',
+
+	#'/store/data/Run2017B/SingleElectron/MINIAOD/31Mar2018-v1/30000/40BCA89D-2C38-E811-9682-008CFAC93CF8.root' 
+    #'file:/eos/cms/store/user/kawong/40BCA89D-2C38-E811-9682-008CFAC93CF8.root', # 2017 SingleElectron
+
     #'/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14-v1/910000/ECC11159-F647-E811-A157-001E67792510.root', # DY MC 2017 Madgraph RecoSIM step
-    #'file:/afs/cern.ch/work/y/yofeng/public/WGamma/SingleElectronMiniAOD/00622F98-20EB-E611-A0A4-28924A33AFF6.root'
-    #'file:/afs/cern.ch/work/y/yofeng/public/WGamma/SingleElectronMiniAOD/FA3923C7-878E-E711-A8BE-0CC47A7C3420.root '
-    #'file:/afs/cern.ch/work/y/yofeng/public/WGamma/SignalMiniAOD/FEAAD8B5-E7FC-E611-81C1-008CFA197B74.root'
-    #'file:/afs/cern.ch/work/y/yofeng/public/WGamma/QCDMiniAOD/FCF48CF4-C5B1-E611-9D65-0CC47A4D766C.root'
-    #'file:/afs/cern.ch/work/y/yofeng/public/WGamma/SingleElectronMiniAOD/00622F98-20EB-E611-A0A4-28924A33AFF6.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2016G/SingleElectron/MINIAOD/23Sep2016-v1/100000/004A7893-A990-E611-B29F-002590E7DE36.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50000/004A75AB-B2EA-E611-B000-24BE05CEFDF1.root',
 ]
+opt.outputFile = "ntuple.root"
 
 
 #defaults
@@ -63,8 +68,10 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(opt.nEvents))
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck') 
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('ntuple.root' )
+                                   #fileName = cms.string('ntuple.root' )
+								  	fileName = cms.string(opt.outputFile)
 )
+			
 
 
 #-----------------------------------------------------
@@ -107,11 +114,13 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 if opt.year == 2016: 
 	dataGlobalTag = '94X_dataRun2_v10'
 	mcGlobalTag = '94X_mcRun2_asymptotic_v3'
-    egamma_era='2016-Legacy'
+	egamma_era='2016-Legacy'
+	prefire_era="2016BtoH"
 if opt.year == 2017:
- 	dataGlobalTag = '94X_dataRun2_v11'
+	dataGlobalTag = '94X_dataRun2_v11'
 	mcGlobalTag = '94X_mc2017_realistic_v17'
-    egamma_era='2017-Nov17ReReco'
+	egamma_era='2017-Nov17ReReco'
+	prefire_era="2017BtoF"
 
 if opt.isMC == 1:
   process.GlobalTag = GlobalTag(process.GlobalTag, mcGlobalTag, '')
@@ -422,15 +431,14 @@ filter_map = cms.untracked.vstring(
     '101:Flag_BadPFMuonFilter',
 )
 
-process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
-                                 ThePhotons = cms.InputTag("slimmedPhotons"),
-	                         TheJets = cms.InputTag("slimmedJets"),
-                                 L1Maps = cms.string("src/L1Prefiring/EventWeightProducer/files/L1PrefiringMaps_new.root"), # update this line with the location of this file
-                                 DataEra = cms.string("2016BtoH"),
-                                 #DataEra = cms.string("2017BtoF"), #Use 2016BtoH for 2016
-                                 UseJetEMPt = cms.bool(False), #can be set to true to use jet prefiring maps parametrized vs pt(em) instead of pt
-	                         PrefiringRateSystematicUncty = cms.double(0.2) #Minimum relative prefiring uncty per object
-                                 )
+
+from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
+    DataEra = cms.string(prefire_era),
+    UseJetEMPt = cms.bool(False),
+    PrefiringRateSystematicUncty = cms.double(0.2),
+    SkipWarnings = False)
+
 if opt.year == 2016:
         elecIdVeryLooseStr = cms.untracked.string("cutBasedElectronID-Summer16-80X-V1-veto")
         elecIdLooseStr     = cms.untracked.string("cutBasedElectronID-Summer16-80X-V1-loose")
@@ -522,7 +530,6 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
 
 process.p = cms.Path()
 
-#process.p += process.selectedElectrons
 process.p += process.egammaPostRecoSeq
 # run additional MET filters
 process.p += process.BadPFMuonFilter
