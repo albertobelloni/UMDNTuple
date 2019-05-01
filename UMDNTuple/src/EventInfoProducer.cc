@@ -57,11 +57,11 @@ void EventInfoProducer::initialize(
     tree -> Branch( "vtx_n", &vtx_n, "vtx_n/I");
     tree -> Branch( "pu_n", &pu_n, "pu_n/I");
     tree -> Branch( "rho", &rho, "rho/F");
-    tree -> Branch( "prefweight", &prefweight, "prefweight/F"); // should be run with MC only?
-    tree -> Branch( "prefweightup", &prefweightup, "prefweightup/F");
-    tree -> Branch( "prefweightdown", &prefweightdown, "prefweightdown/F");
 
     if( _isMC ) {
+    	tree -> Branch( "prefweight", &prefweight, "prefweight/F"); // should be run with MC only?
+    	tree -> Branch( "prefweightup", &prefweightup, "prefweightup/F");
+    	tree -> Branch( "prefweightdown", &prefweightdown, "prefweightdown/F");
         tree -> Branch( "truepu_n", &truepu_n, "truepu_n/I");
         tree -> Branch( "EventWeights", &EventWeights);
         tree -> Branch( "pdf_id1", &pdf_id1, "pdf_id1/F");
@@ -102,15 +102,18 @@ void EventInfoProducer::produce(const edm::Event &iEvent ) {
     edm::Handle<double>   rho_h;
     iEvent.getByToken(_rhoToken, rho_h);
 
-    edm::Handle< double > theprefweight;
-    edm::Handle< double > theprefweightup;
-    edm::Handle< double > theprefweightdown;
-    iEvent.getByToken(_prefweight_token, theprefweight ) ;
-    prefweight =(*theprefweight);
-    iEvent.getByToken(_prefweightup_token, theprefweightup ) ;
-    prefweightup =(*theprefweightup);
-    iEvent.getByToken(_prefweightdown_token, theprefweightdown ) ;
-    prefweightdown =(*theprefweightdown);
+    if (_isMC){
+
+       edm::Handle< double > theprefweight;
+       edm::Handle< double > theprefweightup;
+       edm::Handle< double > theprefweightdown;
+       iEvent.getByToken(_prefweight_token, theprefweight ) ;
+       prefweight =(*theprefweight);
+       iEvent.getByToken(_prefweightup_token, theprefweightup ) ;
+       prefweightup =(*theprefweightup);
+       iEvent.getByToken(_prefweightdown_token, theprefweightdown ) ;
+       prefweightdown =(*theprefweightdown);
+    }
 
     eventNumber      = iEvent.id().event();
     runNumber     = iEvent.id().run();

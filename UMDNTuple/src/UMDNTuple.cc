@@ -81,6 +81,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     if( iConfig.exists("jetMinPt") ) {
         jetMinPt  = iConfig.getUntrackedParameter<double>("jetMinPt");
     }
+    std::cout<< iConfig.exists("jetMinPt")<< " minpt "<<iConfig.getUntrackedParameter<double>("jetMinPt")<<" "<<jetMinPt<<std::endl;
     if( iConfig.exists("fjetMinPt") ) {
         fjetMinPt = iConfig.getUntrackedParameter<double>("fjetMinPt");
     }
@@ -170,7 +171,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
         rhoToken = consumes<double>(
                  iConfig.getUntrackedParameter<edm::InputTag>("rhoTag"));
     }
-    if( iConfig.exists("prefTag")) { 
+    if( iConfig.exists("prefTag") && _isMC) { 
 	prefweight_token = consumes< double >(
 		  iConfig.getUntrackedParameter<edm::InputTag>("prefTag")); 
 	prefweightup_token = consumes< double >(

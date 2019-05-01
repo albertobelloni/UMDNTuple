@@ -23,13 +23,13 @@ opt.inputFiles = [
     #'/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/90000/FE8A7852-66E4-E611-B5D0-002590E7E01A.root', # DY MC 2016
 
 	#'/store/data/Run2016H/SingleElectron/MINIAOD/17Jul2018-v1/00000/582D84C6-EB8B-E811-8313-0025905B861C.root', ##SingleElectron2016H re-miniaod
-	'file:/eos/cms/store/user/kawong/582D84C6-EB8B-E811-8313-0025905B861C.root', ##SingleElectron2016H re-miniaod
+	#'file:/eos/cms/store/user/kawong/582D84C6-EB8B-E811-8313-0025905B861C.root', ##SingleElectron2016H re-miniaod
 
 	#'/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/100000/0C2AEF4D-1FBF-E811-A04F-B496910A80F4.root', ##2016 DY MC re-miniaod (v3)
-	#'file:/eos/cms/store/user/kawong/0C2AEF4D-1FBF-E811-A04F-B496910A80F4.root', ##2016 DY MC re-miniaod (v3)
+	'file:/eos/cms/store/user/kawong/0C2AEF4D-1FBF-E811-A04F-B496910A80F4.root', ##2016 DY MC re-miniaod (v3)
 
     #'/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/40000/04F71189-4742-E811-AA48-008CFAC9157C.root',
-    'file:/eos/cms/store/user/kawong/04F71189-4742-E811-AA48-008CFAC9157C.root',
+    #'file:/eos/cms/store/user/kawong/04F71189-4742-E811-AA48-008CFAC9157C.root',
 
 	#'/store/data/Run2017B/SingleElectron/MINIAOD/31Mar2018-v1/30000/40BCA89D-2C38-E811-9682-008CFAC93CF8.root' 
     #'file:/eos/cms/store/user/kawong/40BCA89D-2C38-E811-9682-008CFAC93CF8.root', # 2017 SingleElectron
@@ -52,6 +52,8 @@ process.source = cms.Source("PoolSource",
 # try to determine if its data or MC based on the name
 # otherwise request the user to provide isMC=
 print "isMC: ", opt.isMC
+print "year: ", opt.year
+print "outputfile: ", opt.outputFile
 if opt.isMC < 0 and len(process.source.fileNames) > 0:
   if re.match(r'.*/(MINI)?AODSIM/.*', process.source.fileNames[0]):
     print "MC dataset detected."
@@ -261,7 +263,7 @@ if opt.year == 2017:
     )
 
 if opt.year == 2016: 
-	trigger_map2016 = cms.untracked.vstring( 
+	trigger_map = cms.untracked.vstring( 
     # Muon triggers
     '0:HLT_Mu8',
     '1:HLT_Mu17',
@@ -480,8 +482,8 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
     fatjetTag     = cms.untracked.InputTag('slimmedJetsAK8'),
     metTag     = cms.untracked.InputTag('slimmedMETs'),
     triggerTag  = cms.untracked.InputTag('TriggerResults', '', 'HLT'),
-    triggerObjTag = cms.untracked.InputTag('selectedPatTrigger'),
-    #triggerObjTag = cms.untracked.InputTag('slimmedPatTrigger'), # 2017
+    #triggerObjTag = cms.untracked.InputTag('selectedPatTrigger'),
+    triggerObjTag = cms.untracked.InputTag('slimmedPatTrigger'), # 2017
     triggerMap = trigger_map,
     metFilterTag  = cms.untracked.InputTag('TriggerResults', '', 'RECO'),
     BadChargedCandidateFilter = cms.untracked.InputTag('BadChargedCandidateFilter'),
@@ -493,9 +495,9 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
     #conversionsTag = cms.untracked.InputTag('allConversions' ),
     verticesTag  = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),
     rhoTag  = cms.untracked.InputTag('fixedGridRhoFastjetAll'),
-    prefTag = cms.untracked.InputTag('prefiringweight:NonPrefiringProb'),
-    prefupTag = cms.untracked.InputTag('prefiringweight:NonPrefiringProbUp'),
-    prefdownTag = cms.untracked.InputTag('prefiringweight:NonPrefiringProbDown'),
+    prefTag = cms.untracked.InputTag('prefiringweight:nonPrefiringProb'),
+    prefupTag = cms.untracked.InputTag('prefiringweight:nonPrefiringProbUp'),
+    prefdownTag = cms.untracked.InputTag('prefiringweight:nonPrefiringProbDown'),
     puTag   = cms.untracked.InputTag('slimmedAddPileupInfo'),
     lheEventTag  = cms.untracked.InputTag('externalLHEProducer'),
     lheRunTag  = cms.untracked.InputTag('externalLHEProducer'),

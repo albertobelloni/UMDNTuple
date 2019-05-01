@@ -38,7 +38,6 @@ void FatJetProducer::initialize( const std::string &prefix,
     tree->Branch( (prefix + "_ak08_Puppi_tau2" ).c_str(), &jet_ak08_Puppi_tau2 );
     tree->Branch( (prefix + "_ak08_Puppi_tau3" ).c_str(), &jet_ak08_Puppi_tau3 );
 
-    _jetProducer.initialize( prefix, jetTok, tree, 0 );
 
 
 
@@ -59,7 +58,7 @@ void FatJetProducer::produce(const edm::Event &iEvent ) {
     jet_ak08_Puppi_tau2->clear();
     jet_ak08_Puppi_tau3->clear();
 
-    _jetProducer.produce( iEvent );
+    //_jetProducer.produce( iEvent );
 
     iEvent.getByToken(_jetToken,jets);
 
@@ -68,8 +67,7 @@ void FatJetProducer::produce(const edm::Event &iEvent ) {
  
         if( jet->pt() < _minPt ) continue;
 
-        //jet_ak08_prunedMass -> push_back( jet->userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass") );
-        jet_ak08_prunedMass -> push_back( jet->userFloat("ak8PFJetsCHSPrunedMass") );
+        jet_ak08_prunedMass -> push_back( jet->userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass") );
 
 
 //Available user floats : 
@@ -88,16 +86,13 @@ void FatJetProducer::produce(const edm::Event &iEvent ) {
 //ak8PFJetsPuppiSoftDropMass 
 
 
-        //jet_ak08_FilteredMass->push_back(jet->userFloat("ak8PFJetsCHSFilteredMass"));
-        jet_ak08_SoftDropMass->push_back(jet->userFloat("ak8PFJetsCHSSoftDropMass"));
-        //jet_ak08_Puppi_SoftDropMass->push_back(jet->userFloat("ak8PFJetsPuppiSoftDropMass"));
-        //jet_ak08_TrimmedMass->push_back(jet->userFloat("ak8PFJetsCHSTrimmedMass"));
-        jet_ak08_tau1->push_back(jet->userFloat("NjettinessAK8:tau1"));
-        jet_ak08_tau2->push_back(jet->userFloat("NjettinessAK8:tau2"));
-        jet_ak08_tau3->push_back(jet->userFloat("NjettinessAK8:tau3"));
-        jet_ak08_Puppi_tau1->push_back(jet->userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1"));
-        jet_ak08_Puppi_tau2->push_back(jet->userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2"));
-        jet_ak08_Puppi_tau3->push_back(jet->userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3"));
+        jet_ak08_SoftDropMass->push_back(jet->userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSSoftDropMass"));
+        jet_ak08_tau1->push_back(jet->userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau1"));
+        jet_ak08_tau2->push_back(jet->userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau2"));
+        jet_ak08_tau3->push_back(jet->userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau3"));
+        jet_ak08_Puppi_tau1->push_back(jet->userFloat("NjettinessAK8Puppi:tau1"));
+        jet_ak08_Puppi_tau2->push_back(jet->userFloat("NjettinessAK8Puppi:tau2"));
+        jet_ak08_Puppi_tau3->push_back(jet->userFloat("NjettinessAK8Puppi:tau3"));
     }
 
 }

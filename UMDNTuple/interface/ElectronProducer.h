@@ -82,6 +82,7 @@ class ElectronProducer {
         std::vector<float> *el_dEtaClusterTrack;
         std::vector<float> *el_dPhiClusterTrack;
         std::vector<float> *el_sc_rawE;
+        std::vector<float> *el_sc_e;
         std::vector<float> *el_ecalIso;
         std::vector<float> *el_ecalPfIso;
         std::vector<float> *el_aeff;

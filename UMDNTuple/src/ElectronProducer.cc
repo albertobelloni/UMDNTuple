@@ -33,6 +33,7 @@ ElectronProducer::ElectronProducer(  ) :
     el_dEtaClusterTrack (0),
     el_dPhiClusterTrack (0),
     el_sc_rawE(0),
+    el_sc_e(0),
     el_ecalIso(0),
     el_ecalPfIso(0),
     el_aeff(0),
@@ -348,7 +349,7 @@ void ElectronProducer::produce(const edm::Event &iEvent ) {
 
             el_charge -> push_back(el->charge());
             el_sc_eta->push_back(el->superCluster()->eta());
-            el_sc_eta->push_back(el->superCluster()->energy());
+            el_sc_e->push_back(el->superCluster()->energy());
 
             if( _detail > 1 ) {
 
