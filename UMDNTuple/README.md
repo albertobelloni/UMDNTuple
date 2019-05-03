@@ -31,11 +31,6 @@ this will produce the ntuple.root under the current directory
 (Note the default input file is no lxplus. You need to change it if on a different site.)
 
 ## Submit with crab
-after the standard settings to run crab (i.e., voms and source crab), 
-
-```
-cd ${CMSSW_BASE}
-```
 edit the datasets in `data_samples` and `mc_samples`, under `submit_crab.py` 
 Also note that there exist two separate lists for 2016 and 2017
 
