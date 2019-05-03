@@ -1,6 +1,6 @@
 # Setup for 2016 and 2017 data analysis
 
-This configuration is harmonized for the latest version of 94X miniAOD dataset for 2016 and 2017 ::heartbeat::
+This configuration is harmonized for the latest version of 94X miniAOD dataset for 2016 and 2017 :heartbeat:
 
 Current architecture: SL6 gcc630
 
