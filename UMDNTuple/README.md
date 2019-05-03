@@ -1,6 +1,8 @@
-#Setup for 2016 and 2017 data analysis
+# Setup for 2016 and 2017 data analysis
 
 This configuration is harmonized for the latest version of 94X miniAOD dataset for 2016 and 2017
+Current architecture: SL6 gcc630
+2018 remains separate as it uses 102X
 
 ## Setup CMSSW
 ```
