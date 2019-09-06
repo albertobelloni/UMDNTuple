@@ -23,7 +23,11 @@ class EventInfoProducer {
                         const edm::EDGetTokenT<GenEventInfoProduct> & ,
                         const edm::EDGetTokenT<LHEEventProduct> & , 
                         const edm::EDGetTokenT<LHERunInfoProduct> & , 
-                        const edm::EDGetTokenT<double> & , TTree *, TTree *, bool);
+                        const edm::EDGetTokenT<double> & ,
+                        const edm::EDGetTokenT<double> & ,
+                        const edm::EDGetTokenT<double> & ,
+                        const edm::EDGetTokenT<double> & ,
+			 TTree *, TTree *, bool);
 
         void disableEventWeights() {_disableEventWeights=true;}
         void produce(const edm::Event &iEvent );
@@ -43,6 +47,10 @@ class EventInfoProducer {
         int truepu_n;
         std::vector<double> *EventWeights;
         float rho;
+        float prefweight;
+        float  prefweightup;
+        float  prefweightdown;
+
 
         float pdf_id1;
         float pdf_id2;
@@ -56,6 +64,9 @@ class EventInfoProducer {
         edm::EDGetTokenT<LHEEventProduct> _lheEventToken;
         edm::EDGetTokenT<LHERunInfoProduct> _lheRunToken;
         edm::EDGetTokenT<double> _rhoToken;
+        edm::EDGetTokenT< double > _prefweight_token;
+        edm::EDGetTokenT< double > _prefweightup_token;
+        edm::EDGetTokenT< double > _prefweightdown_token;
 
         TTree * _infoTree;
         bool _isMC;

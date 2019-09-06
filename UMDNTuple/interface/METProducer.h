@@ -26,6 +26,8 @@ class METProducer {
 
         float met_pt;
         float met_phi;
+	std::vector<float> *allmet_pt;
+	std::vector<float> *allmet_phi;
 
         float met_JetResUp_pt;
         float met_JetResUp_phi;
@@ -58,6 +60,12 @@ class METProducer {
         float met_UnclusteredEnDown_phi;
 
 
+        float met_Type1XY_pt;      
+        float met_Type1XY_phi;     
+        float met_Type1Smear_pt;   
+        float met_Type1Smear_phi;  
+        float met_Type1SmearXY_pt; 
+        float met_Type1SmearXY_phi;
         edm::EDGetTokenT<edm::View<pat::MET> > _metToken;
         edm::Handle<edm::View<pat::MET> > mets;
 

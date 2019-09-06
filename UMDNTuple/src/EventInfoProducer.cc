@@ -14,6 +14,9 @@ EventInfoProducer::EventInfoProducer(  ) :
     truepu_n(0),
     EventWeights(0),
     rho(0),
+    prefweight(0),
+    prefweightup(0),
+    prefweightdown(0),
     _infoTree(0),
     _isMC(0),
     _disableEventWeights(0)
@@ -29,6 +32,9 @@ void EventInfoProducer::initialize(
                         const edm::EDGetTokenT<LHEEventProduct> & lheEventTok, 
                         const edm::EDGetTokenT<LHERunInfoProduct> & lheRunTok, 
                         const edm::EDGetTokenT<double> & rhoTok, 
+                        const edm::EDGetTokenT< double >&prefTok,
+                        const edm::EDGetTokenT< double >&prefupTok,
+                        const edm::EDGetTokenT< double >&prefdownTok,
                         TTree *tree, TTree *infoTree, bool isMC) {
 
     _vertexToken = vtxTok;
@@ -37,6 +43,9 @@ void EventInfoProducer::initialize(
     _lheEventToken = lheEventTok;
     _lheRunToken = lheRunTok;
     _rhoToken = rhoTok;
+    _prefweight_token = prefTok;
+    _prefweightup_token = prefupTok;
+    _prefweightdown_token = prefdownTok;
     _isMC = isMC;
 
 
@@ -50,6 +59,9 @@ void EventInfoProducer::initialize(
     tree -> Branch( "rho", &rho, "rho/F");
 
     if( _isMC ) {
+    	tree -> Branch( "prefweight", &prefweight, "prefweight/F"); // should be run with MC only?
+    	tree -> Branch( "prefweightup", &prefweightup, "prefweightup/F");
+    	tree -> Branch( "prefweightdown", &prefweightdown, "prefweightdown/F");
         tree -> Branch( "truepu_n", &truepu_n, "truepu_n/I");
         tree -> Branch( "EventWeights", &EventWeights);
         tree -> Branch( "pdf_id1", &pdf_id1, "pdf_id1/F");
@@ -67,6 +79,9 @@ void EventInfoProducer::produce(const edm::Event &iEvent ) {
 
     vtx_n = 0;
     pu_n = 0;
+    prefweight = 0. ;
+    prefweightup = 0.;
+    prefweightdown =0.;
 
     if( _isMC ) {
 
@@ -86,6 +101,19 @@ void EventInfoProducer::produce(const edm::Event &iEvent ) {
 
     edm::Handle<double>   rho_h;
     iEvent.getByToken(_rhoToken, rho_h);
+
+    if (_isMC){
+
+       edm::Handle< double > theprefweight;
+       edm::Handle< double > theprefweightup;
+       edm::Handle< double > theprefweightdown;
+       iEvent.getByToken(_prefweight_token, theprefweight ) ;
+       prefweight =(*theprefweight);
+       iEvent.getByToken(_prefweightup_token, theprefweightup ) ;
+       prefweightup =(*theprefweightup);
+       iEvent.getByToken(_prefweightdown_token, theprefweightdown ) ;
+       prefweightdown =(*theprefweightdown);
+    }
 
     eventNumber      = iEvent.id().event();
     runNumber     = iEvent.id().run();

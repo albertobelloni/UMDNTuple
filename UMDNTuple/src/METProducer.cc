@@ -5,6 +5,8 @@
 METProducer::METProducer(  ) : 
     met_pt(0),
     met_phi(0),
+    allmet_pt(0),
+    allmet_phi(0),
     met_JetResUp_pt(0),
     met_JetResUp_phi(0),
     met_JetResDown_pt(0),
@@ -28,8 +30,13 @@ METProducer::METProducer(  ) :
     met_UnclusteredEnUp_pt(0),
     met_UnclusteredEnUp_phi(0),
     met_UnclusteredEnDown_pt(0),
-    met_UnclusteredEnDown_phi(0)
-
+    met_UnclusteredEnDown_phi(0),
+    met_Type1XY_pt(0)       ,
+    met_Type1XY_phi(0)      ,
+    met_Type1Smear_pt(0)    ,
+    met_Type1Smear_phi(0)   ,
+    met_Type1SmearXY_pt(0)  ,
+    met_Type1SmearXY_phi(0) 
 {
 
 }
@@ -43,6 +50,8 @@ void METProducer::initialize( const std::string &prefix,
 
     tree->Branch( (prefix + "_pt" ).c_str(), &met_pt );
     tree->Branch( (prefix + "_phi").c_str(), &met_phi );
+    tree->Branch( (prefix + "_all_pt" ).c_str(), &allmet_pt );
+    tree->Branch( (prefix + "_all_phi").c_str(), &allmet_phi );
 
     tree->Branch( (prefix + "_JetResUp_pt").c_str()           , &met_JetResUp_pt );
     tree->Branch( (prefix + "_JetResUp_phi").c_str()          , &met_JetResUp_phi );
@@ -68,6 +77,12 @@ void METProducer::initialize( const std::string &prefix,
     tree->Branch( (prefix + "_UnclusteredEnUp_phi").c_str()   , &met_UnclusteredEnUp_phi );
     tree->Branch( (prefix + "_UnclusteredEnDown_pt").c_str()  , &met_UnclusteredEnDown_pt );
     tree->Branch( (prefix + "_UnclusteredEnDown_phi").c_str() , &met_UnclusteredEnDown_phi );
+    tree->Branch( (prefix + "_Type1XY_pt").c_str() , &met_Type1XY_pt );
+    tree->Branch( (prefix + "_Type1XY_phi").c_str() , &met_Type1XY_phi );
+    tree->Branch( (prefix + "_Type1Smear_pt").c_str() , &met_Type1Smear_pt );
+    tree->Branch( (prefix + "_Type1Smear_phi").c_str() , &met_Type1Smear_phi );
+    tree->Branch( (prefix + "_Type1SmearXY_pt").c_str() , &met_Type1SmearXY_pt );
+    tree->Branch( (prefix + "_Type1SmearXY_phi").c_str() , &met_Type1SmearXY_phi );
 
 
 }
@@ -79,6 +94,27 @@ void METProducer::produce(const edm::Event &iEvent ) {
 
     met_pt = mets->ptrAt(0)->pt();
     met_phi = mets->ptrAt(0)->phi();
+    allmet_pt->clear();
+    allmet_phi->clear();
+   
+    //std::cout<<pat::MET::Raw<<" "<<pat::MET::METCorrectionLevelSize<<std::endl;
+    //for  (int i =pat::MET::Raw ; i!=pat::MET::METCorrectionLevelSize-1;i++){
+    for  (int i =0; i<10;i++){ // difference between 80X and 94X... extra corrections added
+	pat::MET::METCorrectionLevel ii = static_cast<pat::MET::METCorrectionLevel> (i);
+	//std::cout<<i<< " "<<mets->ptrAt(0)->corPt (ii)<< " "
+	//       	 	  <<mets->ptrAt(0)->corPhi(ii)<<std::endl;
+    	allmet_pt->push_back(	       mets->ptrAt(0)->corPt (ii));
+    	allmet_phi->push_back(	       mets->ptrAt(0)->corPhi (ii));
+    }
+
+    met_Type1XY_pt            = mets->ptrAt(0)->corPt (pat::MET::Type1XY           );
+    met_Type1XY_phi           = mets->ptrAt(0)->corPhi(pat::MET::Type1XY           );
+    met_Type1Smear_pt         = mets->ptrAt(0)->corPt (pat::MET::Type1Smear           );
+    met_Type1Smear_phi        = mets->ptrAt(0)->corPhi(pat::MET::Type1Smear           );
+    met_Type1SmearXY_pt       = mets->ptrAt(0)->corPt (pat::MET::Type1SmearXY           );
+    met_Type1SmearXY_phi      = mets->ptrAt(0)->corPhi(pat::MET::Type1SmearXY           );
+
+
 
     met_JetResUp_pt           = mets->ptrAt(0)->shiftedPt(pat::MET::JetResUp           );
     met_JetResUp_phi          = mets->ptrAt(0)->shiftedPhi(pat::MET::JetResUp          );

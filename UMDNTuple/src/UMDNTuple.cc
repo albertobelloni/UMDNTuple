@@ -14,6 +14,9 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     _producePhots(true),
     _produceJets(true),
     _produceFJets(true),
+    _produceMET(true),
+    _produceMETFilter(true),
+    _produceTrig(true),
     _produceGen(true),
     _isMC( -1 )
 {
@@ -78,6 +81,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     if( iConfig.exists("jetMinPt") ) {
         jetMinPt  = iConfig.getUntrackedParameter<double>("jetMinPt");
     }
+    std::cout<< iConfig.exists("jetMinPt")<< " minpt "<<iConfig.getUntrackedParameter<double>("jetMinPt")<<" "<<jetMinPt<<std::endl;
     if( iConfig.exists("fjetMinPt") ) {
         fjetMinPt = iConfig.getUntrackedParameter<double>("fjetMinPt");
     }
@@ -94,6 +98,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     std::string prefix_fjet        = "fjet";
     std::string prefix_trig        = "passTrig";
     std::string prefix_gen         = "gen";
+    std::string prefix_pref        = "pref";
     std::string prefix_met         = "met";
     std::string prefix_met_filter  = "metFilter";
 
@@ -118,6 +123,9 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     if( iConfig.exists(prefix_gen) ) {
         prefix_gen = iConfig.getUntrackedParameter<std::string>("prefix_gen");
     }
+    if( iConfig.exists(prefix_pref) ) {
+        prefix_pref = iConfig.getUntrackedParameter<std::string>("prefix_pref");
+    }
     if( iConfig.exists(prefix_met) ) {
         prefix_met = iConfig.getUntrackedParameter<std::string>("prefix_met");
     }
@@ -131,7 +139,11 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     edm::EDGetTokenT<std::vector<reco::Vertex> > verticesToken;
     edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puToken;
     edm::EDGetTokenT<GenEventInfoProduct> generatorToken;
+    edm::EDGetTokenT<double> prefToken;
     edm::EDGetTokenT<double> rhoToken;
+    edm::EDGetTokenT<double> prefweight_token;
+    edm::EDGetTokenT<double> prefweightup_token;
+    edm::EDGetTokenT<double> prefweightdown_token;
     edm::EDGetTokenT<LHEEventProduct> lheEventToken;
     edm::EDGetTokenT<LHERunInfoProduct> lheRunToken;
 
@@ -159,6 +171,14 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
         rhoToken = consumes<double>(
                  iConfig.getUntrackedParameter<edm::InputTag>("rhoTag"));
     }
+    if( iConfig.exists("prefTag") && _isMC) { 
+	prefweight_token = consumes< double >(
+		  iConfig.getUntrackedParameter<edm::InputTag>("prefTag")); 
+	prefweightup_token = consumes< double >(
+		  iConfig.getUntrackedParameter<edm::InputTag>("prefupTag")); 
+	prefweightdown_token = consumes< double >(
+		  iConfig.getUntrackedParameter<edm::InputTag>("prefdownTag")); 
+    }
     if( iConfig.exists("lheEventTag") ) {
         lheEventToken = consumes<LHEEventProduct>(
                  iConfig.getUntrackedParameter<edm::InputTag>("lheEventTag"));
@@ -170,15 +190,15 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
 
     // flags to enable or disable production
     // of objects based on the provided tags
-    _produceJets      = iConfig.exists( "jetTag" );
-    _produceFJets     = iConfig.exists( "fatjetTag" );
-    _produceElecs     = iConfig.exists( "electronTag" );
-    _produceMuons     = iConfig.exists( "muonTag" );
-    _producePhots     = iConfig.exists( "photonTag" );
-    _produceMET       = iConfig.exists( "metTag" );
-    _produceMETFilter = iConfig.exists( "metFilterTag" );
-    _produceTrig      = iConfig.exists( "triggerTag" );
-    _produceGen       = iConfig.exists( "genParticleTag" );
+   // _produceJets      = iConfig.exists( "jetTag" );
+   // _produceFJets     = iConfig.exists( "fatjetTag" );
+   // _produceElecs     = iConfig.exists( "electronTag" );
+   // _produceMuons     = iConfig.exists( "muonTag" );
+   // _producePhots     = iConfig.exists( "photonTag" );
+   // _produceMET       = iConfig.exists( "metTag" );
+   // _produceMETFilter = iConfig.exists( "metFilterTag" );
+   // _produceTrig      = iConfig.exists( "triggerTag" );
+   // _produceGen       = iConfig.exists( "genParticleTag" );
 
     if( !_isMC ) _produceGen = false;
 
@@ -186,7 +206,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     edm::EDGetTokenT<edm::View<pat::Jet> >            jetToken;
     edm::EDGetTokenT<edm::View<pat::Jet> >            fjetToken;
     edm::EDGetTokenT<edm::View<pat::Electron> >       elecToken;
-    edm::EDGetTokenT<edm::View<pat::Electron> >       elecCalibToken;
+    //edm::EDGetTokenT<edm::View<pat::Electron> >       elecCalibToken;
     edm::EDGetTokenT<edm::View<pat::Muon> >           muonToken;
     edm::EDGetTokenT<edm::View<pat::Photon> >         photToken;
     edm::EDGetTokenT<edm::View<pat::Photon> >         photCalibToken;
@@ -195,11 +215,21 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     edm::EDGetTokenT<edm::TriggerResults>             trigToken;
     edm::EDGetTokenT<std::vector<reco::GenParticle> > genToken;
 
+    std::cout << " _produceJets " << _produceJets << std::endl; 
+    std::cout << " _produceFJets " << _produceFJets << std::endl;
+    std::cout << " _produceElecs " << _produceElecs << std::endl;
+    std::cout << " _produceMuons " << _produceMuons << std::endl;
+    std::cout << " _producePhots " << _producePhots << std::endl;
+    std::cout << " _produceMET " << _produceMET << std::endl;
+    std::cout << " _produceMETFilter " << _produceMETFilter << std::endl;
+    std::cout << " _produceTrig " << _produceTrig << std::endl;
+    std::cout << " _produceGen " << _produceGen << std::endl;
 
     // Event information
     _eventProducer.initialize( verticesToken, puToken, 
                                generatorToken, lheEventToken, lheRunToken,
-                               rhoToken, _myTree, _weightInfoTree, _isMC );
+                               rhoToken, prefweight_token, prefweightup_token, prefweightdown_token,
+ 			       _myTree, _weightInfoTree, _isMC );
 
     if(disableEventWeights ) {
         _eventProducer.disableEventWeights();
@@ -208,42 +238,28 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     if( _produceElecs ) {
         elecToken =  consumes<edm::View<pat::Electron> >(
                      iConfig.getUntrackedParameter<edm::InputTag>("electronTag"));
-        elecCalibToken =  consumes<edm::View<pat::Electron> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("electronCalibTag"));
-
-
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > elecIdVeryLooseToken = 
-                     consumes<edm::ValueMap<Bool_t> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("elecIdVeryLooseTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > elecIdLooseToken = 
-                     consumes<edm::ValueMap<Bool_t> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("elecIdLooseTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > elecIdMediumToken = 
-                     consumes<edm::ValueMap<Bool_t> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("elecIdMediumTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > elecIdTightToken = 
-                     consumes<edm::ValueMap<Bool_t> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("elecIdTightTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > elecIdHLTToken = 
-                     consumes<edm::ValueMap<Bool_t> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("elecIdHLTTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > elecIdHEEPToken =  
-                     consumes<edm::ValueMap<Bool_t> >(
-                     iConfig.getUntrackedParameter<edm::InputTag>("elecIdHEEPTag"));
 
         _elecProducer.initialize( prefix_el  , elecToken, _myTree, elecMinPt, elecDetail );
-        _elecProducer.addUserBool( ElectronIdVeryLoose , elecIdVeryLooseToken);
-        _elecProducer.addUserBool( ElectronIdLoose     , elecIdLooseToken);
-        _elecProducer.addUserBool( ElectronIdMedium    , elecIdMediumToken);
-        _elecProducer.addUserBool( ElectronIdTight     , elecIdTightToken);
-        _elecProducer.addUserBool( ElectronIdHLT       , elecIdHLTToken);
-        _elecProducer.addUserBool( ElectronIdHEEP      , elecIdHEEPToken);
+
+        std::string elecIdVeryLoose = iConfig.getUntrackedParameter<std::string>("elecIdVeryLooseStr");
+        std::string elecIdLoose     = iConfig.getUntrackedParameter<std::string>("elecIdLooseStr");
+        std::string elecIdMedium    = iConfig.getUntrackedParameter<std::string>("elecIdMediumStr");
+        std::string elecIdTight     = iConfig.getUntrackedParameter<std::string>("elecIdTightStr");
+        std::string elecIdHEEP      = iConfig.getUntrackedParameter<std::string>("elecIdHEEPStr");
+
+        _elecProducer.addUserString( ElectronIdVeryLoose , elecIdVeryLoose);
+        _elecProducer.addUserString( ElectronIdLoose     , elecIdLoose);
+        _elecProducer.addUserString( ElectronIdMedium    , elecIdMedium);
+        _elecProducer.addUserString( ElectronIdTight     , elecIdTight);
+        _elecProducer.addUserString( ElectronIdHEEP      , elecIdHEEP);
 
         _elecProducer.addConversionsToken( conversionsToken );
         _elecProducer.addBeamSpotToken( beamSpotToken );
         _elecProducer.addVertexToken( verticesToken );
         _elecProducer.addRhoToken( rhoToken );
-        _elecProducer.addCalibratedToken( elecCalibToken );
+
+        std::string elecEneCalib = iConfig.getUntrackedParameter<std::string>("elecEneCalibStr");
+        _elecProducer.addEnergyCalib( elecEneCalib );
     }
 
     if( _produceMuons ) { 
@@ -260,39 +276,30 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
 
         photToken = consumes<edm::View<pat::Photon> >(
                     iConfig.getUntrackedParameter<edm::InputTag>("photonTag"));
-        photCalibToken = consumes<edm::View<pat::Photon> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("photonCalibTag"));
-        edm::EDGetTokenT<edm::ValueMap<float> > phoChIsoToken = 
-                    consumes<edm::ValueMap<float> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("phoChIsoTag"));
-        edm::EDGetTokenT<edm::ValueMap<float> > phoNeuIsoToken = 
-                    consumes<edm::ValueMap<float> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("phoNeuIsoTag"));
-        edm::EDGetTokenT<edm::ValueMap<float> > phoPhoIsoToken = 
-                    consumes<edm::ValueMap<float> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("phoPhoIsoTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > phoIdLooseToken = 
-                    consumes<edm::ValueMap<Bool_t> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("phoIdLooseTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > phoIdMediumToken = 
-                    consumes<edm::ValueMap<Bool_t> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("phoIdMediumTag"));
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > phoIdTightToken = 
-                    consumes<edm::ValueMap<Bool_t> >(
-                    iConfig.getUntrackedParameter<edm::InputTag>("phoIdTightTag"));
 
         _photProducer.initialize( prefix_ph       , photToken, _myTree, photMinPt, photDetail );
-        _photProducer.addUserFloat( PhotonChIso        , phoChIsoToken );
-        _photProducer.addUserFloat( PhotonNeuIso       , phoNeuIsoToken );
-        _photProducer.addUserFloat( PhotonPhoIso       , phoPhoIsoToken );
-        _photProducer.addUserBool( PhotonVIDLoose      , phoIdLooseToken );
-        _photProducer.addUserBool( PhotonVIDMedium     , phoIdMediumToken );
-        _photProducer.addUserBool( PhotonVIDTight      , phoIdTightToken );
+
+        std::string phoChIso  = iConfig.getUntrackedParameter<std::string>("phoChIsoStr");
+        std::string phoNeuIso = iConfig.getUntrackedParameter<std::string>("phoNeuIsoStr");
+        std::string phoPhoIso = iConfig.getUntrackedParameter<std::string>("phoPhoIsoStr");
+        std::string phoIdLoose  = iConfig.getUntrackedParameter<std::string>("phoIdLooseStr");
+        std::string phoIdMedium = iConfig.getUntrackedParameter<std::string>("phoIdMediumStr");
+        std::string phoIdTight  = iConfig.getUntrackedParameter<std::string>("phoIdTightStr");
+
+        _photProducer.addUserString( PhotonChIso        , phoChIso  );
+        _photProducer.addUserString( PhotonNeuIso       , phoNeuIso );
+        _photProducer.addUserString( PhotonPhoIso       , phoPhoIso );
+        _photProducer.addUserString( PhotonVIDLoose      , phoIdLoose  );
+        _photProducer.addUserString( PhotonVIDMedium     , phoIdMedium );
+        _photProducer.addUserString( PhotonVIDTight      , phoIdTight  );
 
         //_photProducer.addElectronsToken( elecToken );
         _photProducer.addConversionsToken( conversionsToken );
         _photProducer.addBeamSpotToken( beamSpotToken );
-        _photProducer.addCalibratedToken( photCalibToken );
+        _photProducer.addRhoToken( rhoToken );
+
+        std::string phoEneCalib = iConfig.getUntrackedParameter<std::string>("phoEneCalibStr");
+        _photProducer.addEnergyCalib( phoEneCalib );
     }
 
     if( _produceJets ) {
@@ -364,7 +371,6 @@ void UMDNTuple::beginJob() {
 }
 
 void UMDNTuple::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) {
-
     _eventProducer.produce( iEvent );
     if( _produceElecs )         _elecProducer      .produce( iEvent );
     if( _produceMuons )         _muonProducer      .produce( iEvent );
@@ -386,8 +392,8 @@ void UMDNTuple::endJob() {
 void UMDNTuple::endRun( edm::Run const& iRun, edm::EventSetup const&) {
 
   _eventProducer.endRun( iRun );
-  _metFilterProducer.endRun();
-  _trigProducer.endRun();
+  if( _produceMETFilter ) _metFilterProducer.endRun();
+  if( _produceTrig ) _trigProducer.endRun();
 
 
 }

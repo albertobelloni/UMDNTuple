@@ -1,6 +1,7 @@
 #include "UMDNTuple/UMDNTuple/interface/PhotonProducer.h"
 #include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
 
 PhotonProducer::PhotonProducer(  ) : 
     ph_n(0),
@@ -18,9 +19,16 @@ PhotonProducer::PhotonProducer(  ) :
     ph_chIso(0),
     ph_neuIso(0),
     ph_phoIso(0),
+    ph_chIsoCorr(0),
+    ph_neuIsoCorr(0),
+    ph_phoIsoCorr(0),
+    ph_aeffch(0),
+    ph_aeffnh(0),
+    ph_aeffph(0),
     ph_sc_eta(0),
     ph_sc_phi(0),
     ph_hOverE(0),
+    ph_hOverE_hdronic(0),
     ph_sigmaIEIE(0),
     ph_sigmaIEIEFull5x5(0),
     ph_r9(0),
@@ -46,6 +54,9 @@ PhotonProducer::PhotonProducer(  ) :
     ph_E2x5Full5x5(0),
     ph_E3x3Full5x5(0),
     ph_E5x5Full5x5(0),
+    _effectiveAreasCH("src/UMDNTuple/UMDNTuple/data/effAreaPhotons_ChargedHadrons_80X.txt"),
+    _effectiveAreasNH("src/UMDNTuple/UMDNTuple/data/effAreaPhotons_NeutralHadrons_80X.txt"),
+    _effectiveAreasPH("src/UMDNTuple/UMDNTuple/data/effAreaPhotons_Photons_80X.txt"),
     _detail(0),
     _tree(0)
 {
@@ -83,10 +94,19 @@ void PhotonProducer::initialize( const std::string &prefix,
         tree->Branch( (prefix + "_neuIso").c_str(), &ph_neuIso );
         tree->Branch( (prefix + "_phoIso").c_str(), &ph_phoIso );
 
+        tree->Branch( (prefix + "_chIsoCorr").c_str(), &ph_chIsoCorr );
+        tree->Branch( (prefix + "_neuIsoCorr").c_str(), &ph_neuIsoCorr );
+        tree->Branch( (prefix + "_phoIsoCorr").c_str(), &ph_phoIsoCorr );
+
+        tree->Branch( (prefix + "_aeffch").c_str(), &ph_aeffch );
+        tree->Branch( (prefix + "_aeffnh").c_str(), &ph_aeffnh );
+        tree->Branch( (prefix + "_aeffph").c_str(), &ph_aeffph );
+
         tree->Branch( (prefix + "_sc_eta").c_str(), &ph_sc_eta );
         tree->Branch( (prefix + "_sc_phi").c_str(), &ph_sc_phi );
 
         tree->Branch( (prefix + "_hOverE").c_str(), &ph_hOverE );
+        tree->Branch( (prefix + "_hOverE_hadronic").c_str(), &ph_hOverE_hdronic);
         tree->Branch( (prefix + "_sigmaIEIE").c_str(), &ph_sigmaIEIE );
         tree->Branch( (prefix + "_sigmaIEIEFull5x5").c_str(), &ph_sigmaIEIEFull5x5 );
         tree->Branch( (prefix + "_r9").c_str(), &ph_r9 );
@@ -123,66 +143,27 @@ void PhotonProducer::initialize( const std::string &prefix,
 
 }
 
-//void PhotonProducer::addUserFloat( const std::string &name, const edm::EDGetTokenT<edm::ValueMap<float> > &userFloat ) {
-//
-//    if( !_tree ) {
-//        std::cout << "PhotonProducer::addUserFloats -- ERROR : Must call initialize before adding user floats" << std::endl;
-//        return;
-//    }
-//
-//    //_tokens_float.push_back( userFloat );
-//    _tokens_float[name] = userFloat;
-//
-//    //ph_user_floats.push_back(0);
-//    ph_user_floats[name] = 0;
-//
-//    //_tree->Branch( (_prefix + "_" + name).c_str(), &(ph_user_floats.back()) );
-//    _tree->Branch( (_prefix + "_" + name).c_str(), &(ph_user_floats[name]) );
-//
-//}
-//
-//void PhotonProducer::addUserBool( const std::string &name, const edm::EDGetTokenT<edm::ValueMap<Bool_t> > &userBool ) {
-//
-//    if( !_tree ) {
-//        std::cout << "PhotonProducer::addUserBool -- ERROR : Must call initialize before adding user bools" << std::endl;
-//        return;
-//    }
-//
-//    //_tokens_bool.push_back( userBool );
-//    _tokens_bool[name] =  userBool;
-//
-//    //ph_user_bools.push_back(0);
-//    ph_user_bools[name] = 0;
-//
-//    //_tree->Branch( (_prefix + "_" + name).c_str(), &(ph_user_bools.back()) );
-//    _tree->Branch( (_prefix + "_" + name).c_str(), &(ph_user_bools[name]) );
-//
-//}
+void PhotonProducer::addUserString( PhotonUserVar type, const std::string userString) {
 
-void PhotonProducer::addUserBool( PhotonUserVar type, const edm::EDGetTokenT<edm::ValueMap<Bool_t> > &userBool ) {
-
-    if( type == PhotonVIDLoose ) {
-        _VIDLooseToken = userBool;
-    }
-    if( type == PhotonVIDMedium ) {
-        _VIDMediumToken = userBool;
-    }
-    if( type == PhotonVIDTight ) {
-        _VIDTightToken = userBool;
-    }
-
-}
-        
-void PhotonProducer::addUserFloat( PhotonUserVar type, const edm::EDGetTokenT<edm::ValueMap<float> > &userFloat) {
-
+    // isolation
     if( type == PhotonChIso) {
-        _ChIsoToken = userFloat;
+        _ChIso = userString;
     }
     if( type == PhotonNeuIso ) {
-        _NeuIsoToken = userFloat;
+        _NeuIso = userString;
     }
     if( type == PhotonPhoIso) {
-        _PhoIsoToken = userFloat;
+        _PhoIso = userString;
+    }
+    // id
+    if( type == PhotonVIDLoose ){
+        _VIDLoose = userString;
+    }
+    if( type == PhotonVIDMedium ){
+        _VIDMedium = userString;
+    }
+    if( type == PhotonVIDTight ){
+        _VIDTight = userString;
     }
 
 }
@@ -193,11 +174,15 @@ void PhotonProducer::addConversionsToken( const edm::EDGetTokenT<reco::Conversio
 void PhotonProducer::addBeamSpotToken( const edm::EDGetTokenT<reco::BeamSpot> & tok) {
     _beamSpotToken= tok;
 }
+void PhotonProducer::addRhoToken( const edm::EDGetTokenT<double> & tok) {
+    _rhoToken = tok;
+}
 //void PhotonProducer::addElectronsToken( const edm::EDGetTokenT<edm::View<pat::Electron> > & tok) {
 //    _ElectronsToken = tok;
 //}
-void PhotonProducer::addCalibratedToken( const edm::EDGetTokenT<edm::View<pat::Photon> > & tok) {
-    _photCalibToken = tok;
+void PhotonProducer::addEnergyCalib( const std::string eneCalib) {
+   // photon energy scale and smearing corrections
+      _eneCalib = eneCalib;
 }
 
 void PhotonProducer::produce(const edm::Event &iEvent ) {
@@ -222,10 +207,19 @@ void PhotonProducer::produce(const edm::Event &iEvent ) {
         ph_neuIso->clear();
         ph_phoIso->clear();
 
+        ph_chIsoCorr->clear();
+        ph_neuIsoCorr->clear();
+        ph_phoIsoCorr->clear();
+
+        ph_aeffch->clear();
+        ph_aeffnh->clear();
+        ph_aeffph->clear();
+
         ph_sc_eta ->clear();
         ph_sc_phi ->clear();
 
         ph_hOverE->clear();
+        ph_hOverE_hdronic->clear();
         ph_sigmaIEIE->clear();
         ph_sigmaIEIEFull5x5->clear();
         ph_r9->clear();
@@ -262,24 +256,15 @@ void PhotonProducer::produce(const edm::Event &iEvent ) {
     edm::Handle<edm::View<pat::Photon> > photons;
     iEvent.getByToken(_photToken,photons);
 
-    edm::Handle<edm::View<pat::Photon> > calibPhotons;
-    iEvent.getByToken(_photCalibToken,calibPhotons);
+    const std::string ph_VIDLoose_str  = _VIDLoose;
+    const std::string ph_VIDMedium_str = _VIDMedium;
+    const std::string ph_VIDTight_str  = _VIDTight;
 
-    edm::Handle<edm::ValueMap<Bool_t> > ph_passVIDLoose_h;
-    edm::Handle<edm::ValueMap<Bool_t> > ph_passVIDMedium_h;
-    edm::Handle<edm::ValueMap<Bool_t> > ph_passVIDTight_h;
+    const std::string ph_chIso_str  = _ChIso;
+    const std::string ph_neuIso_str = _NeuIso; 
+    const std::string ph_phoIso_str = _PhoIso;
 
-    iEvent.getByToken( _VIDLooseToken , ph_passVIDLoose_h );
-    iEvent.getByToken( _VIDMediumToken, ph_passVIDMedium_h );
-    iEvent.getByToken( _VIDTightToken , ph_passVIDTight_h );
-
-    edm::Handle<edm::ValueMap<float> > ph_chIso_h;
-    edm::Handle<edm::ValueMap<float> > ph_neuIso_h;
-    edm::Handle<edm::ValueMap<float> > ph_phoIso_h;
-
-    iEvent.getByToken( _ChIsoToken  , ph_chIso_h );
-    iEvent.getByToken( _NeuIsoToken , ph_neuIso_h );
-    iEvent.getByToken( _PhoIsoToken , ph_phoIso_h );
+    const std::string phoEneCalib_str = _eneCalib;
 
     //edm::Handle<edm::View<pat::Electron> > electrons_h;
     //iEvent.getByToken(_ElectronsToken, electrons_h);
@@ -290,45 +275,69 @@ void PhotonProducer::produce(const edm::Event &iEvent ) {
     edm::Handle<reco::BeamSpot> beamSpot_h;
     iEvent.getByToken(_beamSpotToken, beamSpot_h);
 
+    edm::Handle<double> rho_h;
+    iEvent.getByToken( _rhoToken, rho_h);
+
     // needed for a few shower shape variables
     // do not use for now
     //EcalClusterLazyTools lazyTool(iEvent, iSetup, ecalHitEBToken_, ecalHitEEToken_, ecalHitESToken_ );
 
     for (unsigned int j=0; j < photons->size();++j){
         edm::Ptr<pat::Photon> ph = photons->ptrAt(j);
-        edm::Ptr<pat::Photon> calibPh = calibPhotons->ptrAt(j);
-        // Need to implemnet calibrations
-        //edm::Ptr<pat::Photon> calib_phptr = calibrated_photons->ptrAt(j);
  
         if( ph->pt() < _minPt ) continue;
-        // should be added with calibration
-        //if( isnan(calib_phptr->pt() ) ) continue;
 
         ph_n += 1;
 
-        ph_pt      -> push_back( calibPh->pt() );
-        ph_eta     -> push_back( calibPh->eta() );
-        ph_phi     -> push_back( calibPh->phi() );
-        ph_e       -> push_back( calibPh->energy() );
         ph_ptOrig  -> push_back( ph->pt() );
         ph_etaOrig -> push_back( ph->eta() );
         ph_phiOrig -> push_back( ph->phi() );
         ph_eOrig   -> push_back( ph->energy() );
 
+        auto calibp4 = ph->p4() * ph->userFloat( phoEneCalib_str )/ph->energy() ;
+        ph_pt ->push_back( calibp4.Pt() );
+        ph_eta -> push_back( calibp4.Eta() );
+        ph_phi -> push_back( calibp4.phi() );
+        ph_e -> push_back( calibp4.E() );
+
         if( _detail > 0 ) {
 
-            ph_passVIDLoose -> push_back( (*ph_passVIDLoose_h)[ph] );
-            ph_passVIDMedium -> push_back( (*ph_passVIDMedium_h)[ph] );
-            ph_passVIDTight -> push_back( (*ph_passVIDTight_h)[ph] );
+            ph_passVIDLoose -> push_back(  ph->photonID( ph_VIDLoose_str  ) );
+            ph_passVIDMedium -> push_back( ph->photonID( ph_VIDMedium_str ) );
+            ph_passVIDTight -> push_back(  ph->photonID( ph_VIDTight_str  ) );
 
-            ph_chIso -> push_back( (*ph_chIso_h)[ph] );
-            ph_neuIso -> push_back( (*ph_neuIso_h)[ph] );
-            ph_phoIso -> push_back( (*ph_phoIso_h)[ph] );
+            float chIso  = ph->userFloat( ph_chIso_str  ) ;
+            float neuIso = ph->userFloat( ph_neuIso_str ) ;
+            float phoIso = ph->userFloat( ph_phoIso_str ) ;
+            ph_chIso -> push_back(  chIso );
+            ph_neuIso -> push_back( neuIso );
+            ph_phoIso -> push_back( phoIso );
+
+            // Rho corrected isolation
+            // followed instructions from
+            // https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonIdentificationRun2#Selection_implementation_details
+            // and the implementations from ElectronProducer.cc
+            double rhoPrime = std::max(0., *rho_h);
+            float eACH = _effectiveAreasCH.getEffectiveArea( fabs(ph->superCluster()->eta()) );
+            float eANH = _effectiveAreasNH.getEffectiveArea( fabs(ph->superCluster()->eta()) );
+            float eAPH = _effectiveAreasPH.getEffectiveArea( fabs(ph->superCluster()->eta()) );
+            ph_aeffch->push_back( eACH );
+            ph_aeffnh->push_back( eANH );
+            ph_aeffph->push_back( eAPH );
+            ph_chIsoCorr ->push_back( std::max(0.0,  chIso   - rhoPrime*(eACH))  );
+            ph_neuIsoCorr->push_back( std::max(0.0,  neuIso  - rhoPrime*(eANH))  );
+            ph_phoIsoCorr ->push_back( std::max(0.0, phoIso  - rhoPrime*(eAPH))  );
 
             ph_sc_eta ->push_back(ph->superCluster()->eta());
             ph_sc_phi ->push_back(ph->superCluster()->phi());
 
+            // update according to 
+            // https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonIdentificationRun2#Selection_implementation_details
+            // https://github.com/cms-sw/cmssw/blob/CMSSW_9_0_X/RecoEgamma/PhotonIdentification/plugins/cuts/PhoHadronicOverEMCut.cc#L36
+            // there was a bug in the Photon ID twiki. The hoverE is supposed to be hadTowOverEm
             ph_hOverE->push_back(ph->hadTowOverEm());
+            // save the wrong one just in case it is useful
+            ph_hOverE_hdronic->push_back(ph->hadronicOverEm());
             ph_sigmaIEIE->push_back(ph->sigmaIetaIeta());
             ph_sigmaIEIEFull5x5->push_back(ph->full5x5_sigmaIetaIeta());
             ph_r9->push_back(ph->r9());

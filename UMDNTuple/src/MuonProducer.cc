@@ -8,6 +8,12 @@ MuonProducer::MuonProducer(  ) :
     mu_eta(0),
     mu_phi(0),
     mu_e(0),
+    mu_isLoose(0),
+    mu_isMedium(0),
+    mu_isTight(0),
+    mu_isSoft(0),
+    mu_isHighPt(0),
+    //mu_isTrackerHighPt(0),
     mu_isGlobal(0),
     mu_isTracker(0),
     mu_isPf(0),
@@ -49,6 +55,14 @@ void MuonProducer::initialize( const std::string &prefix,
     tree->Branch( (prefix + "_eta").c_str()           , &mu_eta );
     tree->Branch( (prefix + "_phi").c_str()           , &mu_phi );
     tree->Branch( (prefix + "_e"  ).c_str()           , &mu_e );
+    // new branches 
+    tree->Branch( (prefix + "_isLoose"   ).c_str()         , &mu_isLoose  );
+    tree->Branch( (prefix + "_isMedium"  ).c_str()         , &mu_isMedium );
+    tree->Branch( (prefix + "_isTight"   ).c_str()         , &mu_isTight  );
+    tree->Branch( (prefix + "_isSoft"    ).c_str()         , &mu_isSoft   );
+    tree->Branch( (prefix + "_isHighPt"  ).c_str()         , &mu_isHighPt );
+    //tree->Branch( (prefix + "_isTrackerHighPt"  ).c_str()         , &mu_isTrackerHighPt );
+
     tree->Branch( (prefix + "_isGlobal").c_str()      , &mu_isGlobal );
     tree->Branch( (prefix + "_isTracker").c_str()     , &mu_isTracker );
     tree->Branch( (prefix + "_isPf").c_str()          , &mu_isPf );
@@ -93,6 +107,12 @@ void MuonProducer::produce(const edm::Event &iEvent ) {
     mu_eta           -> clear();
     mu_phi           -> clear();
     mu_e             -> clear();
+    mu_isLoose       -> clear();
+    mu_isMedium      -> clear();
+    mu_isTight       -> clear();
+    mu_isSoft        -> clear();
+    mu_isHighPt      -> clear();
+    //mu_isTrackerHighPt->clear();
     mu_isGlobal      -> clear();
     mu_isTracker     -> clear();
     mu_isPf          -> clear();
@@ -143,6 +163,26 @@ void MuonProducer::produce(const edm::Event &iEvent ) {
         mu_phi -> push_back( mu->phi() );
         mu_e -> push_back( mu->energy() );
 
+        // can implement muon selector once 
+        // move to samples produced with 94X
+        bool isTight = false;
+        bool isSoft  = false;
+        bool isHighPt = false;
+        //bool isTrackerHighPt = false;
+        // need the PV information
+        if( !vertices_h->empty() && !vertices_h->front().isFake() ) {
+          isTight   = mu->isTightMuon( vertices_h->front() );
+          isSoft    = mu->isSoftMuon( vertices_h->front()  );
+          isHighPt  = mu->isHighPtMuon( vertices_h->front() );
+          //isTrackerHighPt = mu->isTrackerHighPtMuon( vertices_h->front() );
+        }
+        mu_isLoose -> push_back( mu->isLooseMuon() );
+        mu_isMedium -> push_back( mu->isMediumMuon() );
+        mu_isTight -> push_back( isTight );
+        mu_isSoft  -> push_back( isSoft );
+        mu_isHighPt -> push_back( isHighPt );
+        //mu_isTrackerHighPt -> push_back( isTrackerHighPt );
+
         bool isTracker =mu->isTrackerMuon();
         bool isGlobal =mu->isGlobalMuon();
         bool isPf = mu->isPFMuon();
@@ -160,7 +200,9 @@ void MuonProducer::produce(const edm::Event &iEvent ) {
             float pfisodb = (chHadIso + std::max(phoIso+neuHadIso - 0.5*chHadIsoPU,0.))/std::max(0.5, mu->pt());
             mu_pfIso->push_back(pfisodb);
 
-            mu_trkIso->push_back(mu->isolationR03().sumPt);
+            // change it to relative isolation
+            mu_trkIso->push_back( mu->isolationR03().sumPt/mu->pt() );
+            //mu_trkIso->push_back(mu->isolationR03().sumPt);
 
             double dZ = -999;
             if( !vertices_h->empty() && !vertices_h->front().isFake() ) {

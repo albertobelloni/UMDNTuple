@@ -8,6 +8,7 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
 
 enum PhotonUserVar {
 
@@ -36,14 +37,14 @@ class PhotonProducer {
         void initialize( const std::string &prefix, 
                          const edm::EDGetTokenT<edm::View<pat::Photon> >&photTok, 
                          TTree *tree, float minPt=5, int detail=99 );
-        //void addUserFloat( const std::string &, const edm::EDGetTokenT<edm::ValueMap<float> > & );
-        void addUserBool ( PhotonUserVar , const edm::EDGetTokenT<edm::ValueMap<Bool_t> > & );
-        void addUserFloat( PhotonUserVar , const edm::EDGetTokenT<edm::ValueMap<float> > & );
+        void addUserString ( PhotonUserVar , const std::string userString);
         
-        void addElectronsToken( const edm::EDGetTokenT<edm::View<pat::Electron> > &);
+        //void addElectronsToken( const edm::EDGetTokenT<edm::View<pat::Electron> > &);
         void addConversionsToken( const edm::EDGetTokenT<reco::ConversionCollection> &);
         void addBeamSpotToken( const edm::EDGetTokenT<reco::BeamSpot> &);
-        void addCalibratedToken( const edm::EDGetTokenT<edm::View<pat::Photon> > &);
+        //void addCalibratedToken( const edm::EDGetTokenT<edm::View<pat::Photon> > &);
+        void addRhoToken( const edm::EDGetTokenT<double> & );
+        void addEnergyCalib( const std::string eneCalib);
         
         void produce(const edm::Event &iEvent );
 
@@ -65,10 +66,17 @@ class PhotonProducer {
         std::vector<float> *ph_chIso;
         std::vector<float> *ph_neuIso;
         std::vector<float> *ph_phoIso;
+        std::vector<float> *ph_chIsoCorr;
+        std::vector<float> *ph_neuIsoCorr;
+        std::vector<float> *ph_phoIsoCorr; 
+        std::vector<float> *ph_aeffch;
+        std::vector<float> *ph_aeffnh;
+        std::vector<float> *ph_aeffph;
 
         std::vector<float> *ph_sc_eta;
         std::vector<float> *ph_sc_phi;
-        std::vector<float> *ph_hOverE;
+        std::vector<float> *ph_hOverE; 
+        std::vector<float> *ph_hOverE_hdronic;
         std::vector<float> *ph_sigmaIEIE;
         std::vector<float> *ph_sigmaIEIEFull5x5;
         std::vector<float> *ph_r9;
@@ -96,25 +104,25 @@ class PhotonProducer {
         std::vector<float> *ph_E5x5Full5x5;
 
         edm::EDGetTokenT<edm::View<pat::Photon> > _photToken;
-        edm::EDGetTokenT<edm::View<pat::Photon> > _photCalibToken;
 
-        //std::map<std::string, std::vector<float>* > ph_user_floats;
-        //std::map<std::string, std::vector<Bool_t>* > ph_user_bools;
+        std::string  _VIDLoose;
+        std::string  _VIDMedium;
+        std::string  _VIDTight;
 
-        //std::map< std::string, edm::EDGetTokenT<edm::ValueMap<Bool_t> > > _tokens_bool;
-        //std::map< std::string, edm::EDGetTokenT<edm::ValueMap<float> > > _tokens_float;
+        std::string _ChIso;
+        std::string _NeuIso;
+        std::string _PhoIso;
 
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _VIDLooseToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _VIDMediumToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _VIDTightToken;
+        std::string _eneCalib;
 
-        edm::EDGetTokenT<edm::ValueMap<float> > _ChIsoToken;
-        edm::EDGetTokenT<edm::ValueMap<float> > _NeuIsoToken;
-        edm::EDGetTokenT<edm::ValueMap<float> > _PhoIsoToken;
+        EffectiveAreas _effectiveAreasCH;
+        EffectiveAreas _effectiveAreasNH;
+        EffectiveAreas _effectiveAreasPH;
 
         edm::EDGetTokenT<edm::View<pat::Electron> > _ElectronsToken;
         edm::EDGetTokenT<reco::ConversionCollection> _ConversionsToken;
         edm::EDGetTokenT<reco::BeamSpot> _beamSpotToken;
+        edm::EDGetTokenT<double> _rhoToken;
 
         //edm::EDGetTokenT<edm::ValueMap<float> > 
         int _detail;

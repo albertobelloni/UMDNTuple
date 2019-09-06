@@ -8,6 +8,7 @@
 
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
 
 enum ElectronUserVar {
 
@@ -30,13 +31,14 @@ class ElectronProducer {
                          const edm::EDGetTokenT<edm::View<pat::Electron> >&elecTok, 
                          TTree *tree, float minPt=5, int detail=99 );
 
-        void addUserBool ( ElectronUserVar , const edm::EDGetTokenT<edm::ValueMap<Bool_t> > & );
+        //void addUserBool ( ElectronUserVar , const edm::EDGetTokenT<edm::ValueMap<Bool_t> > & );
+        void addUserString( ElectronUserVar type, const std::string userString ) ;
 
         void addConversionsToken( const edm::EDGetTokenT<reco::ConversionCollection> & );
         void addBeamSpotToken( const edm::EDGetTokenT<reco::BeamSpot> & );
         void addVertexToken( const edm::EDGetTokenT<std::vector<reco::Vertex> > & );
         void addRhoToken( const edm::EDGetTokenT<double> & );
-        void addCalibratedToken( const edm::EDGetTokenT<edm::View<pat::Electron> > & );
+        void addEnergyCalib( const std::string eneCalib) ;
 
         void produce(const edm::Event &iEvent );
 
@@ -80,6 +82,7 @@ class ElectronProducer {
         std::vector<float> *el_dEtaClusterTrack;
         std::vector<float> *el_dPhiClusterTrack;
         std::vector<float> *el_sc_rawE;
+        std::vector<float> *el_sc_e;
         std::vector<float> *el_ecalIso;
         std::vector<float> *el_ecalPfIso;
         std::vector<float> *el_aeff;
@@ -95,21 +98,21 @@ class ElectronProducer {
         std::vector<float> *el_hcalTowerSumEt;
 
 
-
-
         edm::EDGetTokenT<edm::View<pat::Electron> > _elecToken;
-        edm::EDGetTokenT<edm::View<pat::Electron> > _elecCalibToken;
 
-        edm::EDGetTokenT<reco::BeamSpot> _beamSpotToken;
+        std::string _IdVeryLoose;
+        std::string _IdLoose;
+        std::string _IdMedium;
+        std::string _IdTight;
+        std::string _IdHLT;
+        std::string _IdHEEP;
+
+        std::string _eneCalib;
+
+        EffectiveAreas _effectiveAreas;
+
         edm::EDGetTokenT<reco::ConversionCollection> _conversionsToken;
-
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _IdVeryLooseToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _IdLooseToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _IdMediumToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _IdTightToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _IdHEEPToken;
-        edm::EDGetTokenT<edm::ValueMap<Bool_t> > _IdHLTToken;
-
+        edm::EDGetTokenT<reco::BeamSpot> _beamSpotToken;
         edm::EDGetTokenT<std::vector<reco::Vertex> > _vertexToken;
         edm::EDGetTokenT<double> _rhoToken;
 

@@ -4,6 +4,7 @@
 #include <string>
 #include "TTree.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
 
@@ -32,6 +33,12 @@ class MuonProducer {
         std::vector<float> *mu_eta;
         std::vector<float> *mu_phi;
         std::vector<float> *mu_e;
+        std::vector<Bool_t> *mu_isLoose;
+        std::vector<Bool_t> *mu_isMedium;
+        std::vector<Bool_t> *mu_isTight;
+	std::vector<Bool_t> *mu_isSoft;
+	std::vector<Bool_t> *mu_isHighPt;
+	//std::vector<Bool_t> *mu_isTrackerHighPt;
         std::vector<Bool_t> *mu_isGlobal;
         std::vector<Bool_t> *mu_isTracker;
         std::vector<Bool_t> *mu_isPf;
