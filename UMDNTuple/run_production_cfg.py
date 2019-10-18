@@ -184,6 +184,7 @@ if opt.year == 2017:
     '34:HLT_Ele200_CaloIdVT_GsfTrkIdT',
     '35:HLT_Ele250_CaloIdVT_GsfTrkIdT',
     '36:HLT_Ele300_CaloIdVT_GsfTrkIdT',
+    '2627:HLT_Ele32_WPTight_Gsf_L1DoubleEG_hltEGL1SingleEGOrFilter', # emulating HLT_Ele32_WPTight_Gsf
     # Photon triggers
     '40:HLT_Photon25',
     '41:HLT_Photon33',
