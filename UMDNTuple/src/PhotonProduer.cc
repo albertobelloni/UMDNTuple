@@ -2,6 +2,7 @@
 #include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 PhotonProducer::PhotonProducer(  ) : 
     ph_n(0),
@@ -54,9 +55,9 @@ PhotonProducer::PhotonProducer(  ) :
     ph_E2x5Full5x5(0),
     ph_E3x3Full5x5(0),
     ph_E5x5Full5x5(0),
-    _effectiveAreasCH("src/UMDNTuple/UMDNTuple/data/effAreaPhotons_cone03_pfChargedHadrons_90percentBased_V2.txt"),
-    _effectiveAreasNH("src/UMDNTuple/UMDNTuple/data/effAreaPhotons_cone03_pfNeutralHadrons_90percentBased_V2.txt"),
-    _effectiveAreasPH("src/UMDNTuple/UMDNTuple/data/effAreaPhotons_cone03_pfPhotons_90percentBased_V2.txt"),
+    _effectiveAreasCH( edm::FileInPath("UMDNTuple/UMDNTuple/data/effAreaPhotons_cone03_pfChargedHadrons_90percentBased_V2.txt").fullPath() ),
+    _effectiveAreasNH( edm::FileInPath("UMDNTuple/UMDNTuple/data/effAreaPhotons_cone03_pfNeutralHadrons_90percentBased_V2.txt").fullPath() ),
+    _effectiveAreasPH( edm::FileInPath("UMDNTuple/UMDNTuple/data/effAreaPhotons_cone03_pfPhotons_90percentBased_V2.txt").fullPath() ),
     _detail(0),
     _tree(0)
 {

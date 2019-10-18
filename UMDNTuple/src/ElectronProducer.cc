@@ -1,6 +1,7 @@
 #include "UMDNTuple/UMDNTuple/interface/ElectronProducer.h"
 #include "FWCore/Framework/interface/EDConsumerBase.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 ElectronProducer::ElectronProducer(  ) : 
     el_n(0),
@@ -48,7 +49,7 @@ ElectronProducer::ElectronProducer(  ) :
     el_ecalRecHitSumEt(0),
     el_hcalTowerSumEt(0),
     //_effectiveAreas("data/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt"),
-    _effectiveAreas( "src/UMDNTuple/UMDNTuple/data/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_94X.txt" ),
+    _effectiveAreas( edm::FileInPath("UMDNTuple/UMDNTuple/data/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_94X.txt").fullPath() ),
     _detail(99)
 {
 
