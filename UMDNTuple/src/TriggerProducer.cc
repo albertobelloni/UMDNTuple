@@ -104,10 +104,23 @@ void TriggerProducer::produce(const edm::Event &iEvent ) {
         }
     }
 
+    // 2017: emulate HLT_Ele32_WPTight_Gsf as 'HLT_Ele32_WPTight_Gsf_L1DoubleEG' && 'hltEGL1SingleEGOrFilter'
+    // See https://twiki.cern.ch/twiki/bin/view/CMS/EgHLTRunIISummary#2017
+    int idx_Ele32L1DEGfilter = 2627; // ID of emulated trigger
+    int idx_Ele32L1DEG = 27;
+    std::string name_Ele32L1DEG = "HLT_Ele32_WPTight_Gsf_L1DoubleEG";
+    bool pass_HLT_Ele32_WPTight_Gsf_L1DoubleEG = false;
+    bool pass_hltEGL1SingleEGOrFilter = false;
+    
     for( std::vector<std::pair<int,int> >::const_iterator mitr = _trigger_idx_map.begin();
             mitr != _trigger_idx_map.end(); ++mitr ) {
         if( triggers->accept( mitr->first ) ) {
             _passing_triggers->push_back( mitr->second );
+            if (mitr->second == idx_Ele32L1DEG
+                && _trigger_map.find(name_Ele32L1DEG) != _trigger_map.end()
+                && _trigger_map[name_Ele32L1DEG] == idx_Ele32L1DEG) {
+                pass_HLT_Ele32_WPTight_Gsf_L1DoubleEG = true;
+            }
         }
     }
     for (unsigned j=0; j < triggerObjects->size();++j){
@@ -118,7 +131,7 @@ void TriggerProducer::produce(const edm::Event &iEvent ) {
         std::vector<std::string> pathNamesLast = obj.pathNames(true);
 
         std::vector<int> passed_trigs;
-
+        
         for( unsigned i = 0; i < pathNamesLast.size(); ++i ) {
             std::string pathname = pathNamesLast[i];
             if( pathname.substr(0,4) != "HLT_" ) continue; // ignore non "HLT" triggers
@@ -142,11 +155,25 @@ void TriggerProducer::produce(const edm::Event &iEvent ) {
             HLTObj_eta->push_back( obj.eta() );
             HLTObj_phi->push_back( obj.phi() );
             HLTObj_e->push_back( obj.energy() );
+            
+            if (pass_HLT_Ele32_WPTight_Gsf_L1DoubleEG) {
+                auto vitr = std::find(passed_trigs.begin(), passed_trigs.end(), idx_Ele32L1DEG);
+                if (vitr != passed_trigs.end()) {
+                    obj.unpackFilterLabels(iEvent, *triggers);
+                    bool obj_hltEGL1SingleEGOrFilter = obj.filter("hltEGL1SingleEGOrFilter");
+                    if (obj_hltEGL1SingleEGOrFilter) {
+                        pass_hltEGL1SingleEGOrFilter = true;
+                        passed_trigs.push_back(idx_Ele32L1DEGfilter);
+                    }
+                }
+            }
             HLTObj_passTriggers->push_back(passed_trigs);
         }
-
     }
-
+    // Add HLT_Ele32_WPTight_Gsf if HLT_Ele32_WPTight_Gsf_L1DoubleEG && hltEGL1SingleEGOrFilter
+    if (pass_HLT_Ele32_WPTight_Gsf_L1DoubleEG && pass_hltEGL1SingleEGOrFilter) {
+        _passing_triggers->push_back(idx_Ele32L1DEGfilter);
+    }
 }
 
 void TriggerProducer::endRun() {
