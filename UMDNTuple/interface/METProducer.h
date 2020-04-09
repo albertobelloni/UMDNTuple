@@ -15,7 +15,7 @@ class METProducer {
         //void initialize( const TTree *tree );
         void initialize( const std::string &prefix, 
                          const edm::EDGetTokenT<edm::View<pat::MET> >&metTok, 
-                         TTree *tree );
+                         TTree *tree , int detail = 1);
 
         void produce(const edm::Event &iEvent );
 
@@ -68,6 +68,8 @@ class METProducer {
         float met_Type1SmearXY_phi;
         edm::EDGetTokenT<edm::View<pat::MET> > _metToken;
         edm::Handle<edm::View<pat::MET> > mets;
+
+		int _detail;
 
 };
 #endif

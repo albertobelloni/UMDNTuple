@@ -61,6 +61,7 @@ private :
   FatJetProducer   _fjetProducer;
   METProducer      _metProducer;
   METProducer      _puppimetProducer;
+  METProducer	   _deepmetProducer;
   METFilterProducer  _metFilterProducer;
   TriggerProducer  _trigProducer;
   
@@ -74,6 +75,7 @@ private :
   bool _produceMETFilter;
   bool _produceTrig;
   bool _produceGen;
+  bool _produceDeepMET;
 
   int _isMC;
   bool _doPref;

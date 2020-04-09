@@ -25,6 +25,13 @@ git clone git@github.com:cms-data/EgammaAnalysis-ElectronTools.git EgammaAnalysi
 scram b -j8
 ```
 
+Get the DeepMETProducer
+```
+git cms-merge-topic yongbinfeng:DeepMET
+scram b -j 8
+```
+There are some warning messages during compiling but it should be fine.
+
 Get the ntuplizer
 ```
 git clone https://github.com/albertobelloni/UMDNTuple

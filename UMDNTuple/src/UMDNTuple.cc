@@ -18,6 +18,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     _produceMETFilter(true),
     _produceTrig(true),
     _produceGen(true),
+    _produceDeepMET(false),
     _isMC( -1 )
 {
     edm::Service<TFileService> fs;
@@ -36,6 +37,9 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     if( iConfig.exists("disableEventWeights" ) ) {
         disableEventWeights = iConfig.getUntrackedParameter<bool>("disableEventWeights");
     }
+
+    _produceDeepMET = iConfig.getUntrackedParameter<bool>("doDeepMET");
+
     // Create tree to store event data
     _myTree = fs->make<TTree>( "EventTree", "EventTree" );
     // Create tree to store metadata
@@ -106,6 +110,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     std::string prefix_pref        = "pref";
     std::string prefix_met         = "met";
     std::string prefix_puppimet    = "puppimet";
+    std::string prefix_deepmet     = "deepmet";
     std::string prefix_met_filter  = "metFilter";
 
     if( iConfig.exists("prefix_el") ) {
@@ -137,6 +142,9 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     }
     if( iConfig.exists("prefix_puppimet") ) {
         prefix_puppimet = iConfig.getUntrackedParameter<std::string>("prefix_puppimet");
+    }
+    if( iConfig.exists("prefix_deepmet") ) {
+        prefix_deepmet = iConfig.getUntrackedParameter<std::string>("prefix_deepmet");
     }
     if( iConfig.exists("prefix_met_filter") ) {
         prefix_met_filter = iConfig.getUntrackedParameter<std::string>("prefix_met_filter");
@@ -226,6 +234,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     edm::EDGetTokenT<edm::View<pat::Photon> >         photCalibToken;
     edm::EDGetTokenT<edm::View<pat::MET> >            metToken;
     edm::EDGetTokenT<edm::View<pat::MET> >            puppimetToken;
+    edm::EDGetTokenT<edm::View<pat::MET> >            deepmetToken;
     edm::EDGetTokenT<edm::TriggerResults>             metFilterToken;
     edm::EDGetTokenT<edm::TriggerResults>             trigToken;
     edm::EDGetTokenT<std::vector<reco::GenParticle> > genToken;
@@ -241,6 +250,7 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
     std::cout << " _produceMETFilter " << _produceMETFilter << std::endl;
     std::cout << " _produceTrig " << _produceTrig << std::endl;
     std::cout << " _produceGen " << _produceGen << std::endl;
+    std::cout << " _produceDeepMET" << _produceDeepMET << std::endl;
 
     // Event information
     _eventProducer.initialize( verticesToken, puToken, 
@@ -343,6 +353,12 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
                     iConfig.getUntrackedParameter<edm::InputTag>("puppimetTag"));
 
         _puppimetProducer .initialize( prefix_puppimet , puppimetToken , _myTree );
+
+        if(_produceDeepMET){
+            deepmetToken  = consumes<edm::View<pat::MET> >(
+                        iConfig.getUntrackedParameter<edm::InputTag>("deepmetTag"));
+            _deepmetProducer .initialize( prefix_deepmet, deepmetToken, _myTree, 0);
+        }
     }
     if( _produceMETFilter ) {
         metFilterToken = consumes<edm::TriggerResults>(
@@ -406,6 +422,9 @@ void UMDNTuple::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup)
     if( _produceMET   ) {
                                 _metProducer       .produce( iEvent );
                                 _puppimetProducer  .produce( iEvent );
+                                if( _produceDeepMET ){
+                                        _deepmetProducer.produce( iEvent );
+                                }
     }
     if( _produceMETFilter  )    _metFilterProducer .produce( iEvent );
     if( _produceTrig  )         _trigProducer      .produce( iEvent );

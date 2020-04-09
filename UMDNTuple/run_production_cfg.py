@@ -491,6 +491,7 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
     fatjetTag     = cms.untracked.InputTag('slimmedJetsAK8'),
     metTag     = cms.untracked.InputTag('slimmedMETs'),
     puppimetTag = cms.untracked.InputTag('slimmedMETsPuppi'),
+    deepmetTag = cms.untracked.InputTag('deepMETProducer'),
     triggerTag  = cms.untracked.InputTag('TriggerResults', '', 'HLT'),
     triggerObjTag = cms.untracked.InputTag('slimmedPatTrigger'),
     triggerMap = trigger_map,
@@ -517,6 +518,7 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
     genParticleTag = cms.untracked.InputTag('prunedGenParticles'),
     genDressedLeptonTag = cms.untracked.InputTag('particleLevel:leptons'),
     genMetTag = cms.untracked.InputTag('particleLevel:mets'),
+    doDeepMET = cms.untracked.bool(True) if opt.year == '2016' else cms.untracked.bool(False),
 
     electronDetailLevel = cms.untracked.int32( 1 ),
     photonDetailLevel = cms.untracked.int32( 1 ),
@@ -533,6 +535,7 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
     prefix_gen  = cms.untracked.string("gen"),
     prefix_met  = cms.untracked.string("met"),
     prefix_puppimet = cms.untracked.string("puppimet"),
+    prefix_deepmet = cms.untracked.string("deepmet"),
 
     electronMinPt = cms.untracked.double( 10 ),
     muonMinPt = cms.untracked.double( 10 ),
@@ -556,6 +559,14 @@ process.p += process.BadChargedCandidateFilter
 
 # prefiring weight
 if opt.isMC and opt.year in ['2016','2017']: process.p += process.prefiringweight
+
+if opt.year == '2016': 
+    from RecoMET.METPUSubtraction.deepMETProducer_cfi import deepMETProducer
+    process.deepMETProducer = deepMETProducer.clone(
+        graph_path = cms.string('RecoMET/METPUSubtraction/data/tf_models/deepmet_2016.pb'),
+        ignore_leptons = cms.bool(True),
+    )
+    process.p += process.deepMETProducer
 
 if opt.isMC == 1:
     process.load("GeneratorInterface.RivetInterface.mergedGenParticles_cfi")
