@@ -62,13 +62,13 @@ void EventInfoProducer::initialize(
     tree -> Branch( "vtx_n", &vtx_n, "vtx_n/I");
     tree -> Branch( "pu_n", &pu_n, "pu_n/I");
     tree -> Branch( "rho", &rho, "rho/F");
+    if ( _doPref )	{
+        tree -> Branch( "prefweight", &prefweight, "prefweight/F"); 
+        tree -> Branch( "prefweightup", &prefweightup, "prefweightup/F");
+        tree -> Branch( "prefweightdown", &prefweightdown, "prefweightdown/F");
+    }
 
     if( _isMC ) {
-    	if ( _doPref )	{
-			tree -> Branch( "prefweight", &prefweight, "prefweight/F"); // should be run with MC only?
-    		tree -> Branch( "prefweightup", &prefweightup, "prefweightup/F");
-    		tree -> Branch( "prefweightdown", &prefweightdown, "prefweightdown/F");
-		}
         tree -> Branch( "truepu_n", &truepu_n, "truepu_n/I");
         tree -> Branch( "EventWeights", &EventWeights);
         tree -> Branch( "pdf_id1", &pdf_id1, "pdf_id1/F");
@@ -84,11 +84,11 @@ void EventInfoProducer::initialize(
 
 void EventInfoProducer::produce(const edm::Event &iEvent ) {
 
-    vtx_n = 0;
-    pu_n = 0;
-    prefweight = 0. ;
-    prefweightup = 0.;
-    prefweightdown =0.;
+    vtx_n = 0 ;
+    pu_n  = 0 ;
+    prefweight     = 1. ;
+    prefweightup   = 1. ;
+    prefweightdown = 1. ;
 
     if( _isMC ) {
 
