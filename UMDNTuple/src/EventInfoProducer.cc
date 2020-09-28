@@ -162,7 +162,7 @@ void EventInfoProducer::produce(const edm::Event &iEvent ) {
             iEvent.getByToken(_lheEventToken, lheevent_h);
             
             // LHE weights
-            if (lheevent_h.isValid()) {
+            if (lheevent_h.isValid() && lheevent_h->weights().size()) {
                 for(unsigned iw = 0; iw < lheevent_h->weights().size(); ++iw){
                     EventWeights->push_back(generator_h->weights()[0] * lheevent_h->weights()[iw].wgt /
                                             lheevent_h->originalXWGTUP());

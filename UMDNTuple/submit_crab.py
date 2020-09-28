@@ -12,10 +12,12 @@ p.add_argument('--version', dest='version', required=True, help='version' )
 p.add_argument('--year', dest='year', required=True,  help='year' )
 p.add_argument('--outputPath', dest='outputPath', default='/store/user/%s/WGamma' %USER, help='output path on storage site, default=/store/user/%s/WGamma' %USER )
 p.add_argument('--site', dest='site', default='T3_US_UMD', help='destination site, default=T3_US_UMD' )
+p.add_argument('--dtype', default = 'All', help='process data type: All, MC, Data, Signal' )
 
 options = p.parse_args()
 
 
+assert any(w in options.dtype for w in ["All","MC","Data","Signal"]), "--dtype must be one of the following: All, MC, Data, Signal"
 
 
 data_samples2016 = [ 
@@ -180,9 +182,10 @@ mc_samples2016 = [
 #    '/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2/MINIAODSIM',
 #    '/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
 #    '/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2/MINIAODSIM',
+]
 
 
-
+signal_samples2016 = [
     '/MadGraphChargedResonance_WGToLNu_M900_width5/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
     '/MadGraphChargedResonance_WGToLNu_M900_width0p01/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
     '/MadGraphChargedResonance_WGToLNu_M800_width5/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
@@ -318,9 +321,10 @@ mc_samples2017 = [
     '/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM',
     '/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM',
     '/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/MINIAODSIM',
+    ]
 
 
-
+signal_samples2017=[
     # ###   2017 signal samples
     "/MadGraphChargedResonance_WGToLNuG_M1000_width0p01/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
     "/MadGraphChargedResonance_WGToLNuG_M1000_width5/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
@@ -426,7 +430,7 @@ mc_samples2018 = [
     # list of MC sample
     # The first arugment is the DAS path for the dataset
     # The second argument controls if the EventWeights are saved (removing them saves disk space)
-    '/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext2-v1/MINIAODSIM' ## more statistics
+    '/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext2-v1/MINIAODSIM', ## more statistics
     '/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
     '/GJets_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18MiniAOD-4cores5k_102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
     '/GJets_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
@@ -459,8 +463,9 @@ mc_samples2018 = [
     '/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM',
     '/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM',
     '/DiPhotonJets_MGG-80toInf_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
+    ]
 
-
+signal_samples2018=[
     ###   2018 signal samples
     '/MadGraphChargedResonance_WGToLNuG_M900_width5/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
     '/MadGraphChargedResonance_WGToLNuG_M900_width0p01/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
@@ -565,16 +570,19 @@ mc_samples2018 = [
 if options.year == "2016":  
     data_samples = data_samples2016
     mc_samples = mc_samples2016
+    signal_samples = signal_samples2016
     json_path = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
 
 if options.year == "2017":
     data_samples = data_samples2017
     mc_samples = mc_samples2017
+    signal_samples= signal_samples2017
     json_path = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
 
 if options.year == "2018":
     data_samples = data_samples2018
     mc_samples = mc_samples2018
+    signal_samples= signal_samples2018
     json_path = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'
 if options.year == "2018D":
     data_samples = data_samples2018D
@@ -589,96 +597,137 @@ if not os.path.isdir( config_dir ) :
 
 submit_commands = []
 
-for path in data_samples :
+if "All" in options.dtype or "Data" in options.dtype:
 
-    base_name = path.split('/')[1]+'_'+path.split('/')[2]
+    for path in data_samples :
 
-    fname = '%s/%s.py'%(config_dir, base_name)
+        base_name = path.split('/')[1]+'_'+path.split('/')[2]
 
-    ofile = open(fname, 'w' )
+        fname = '%s/%s.py'%(config_dir, base_name)
 
-    file_entries = []
+        ofile = open(fname, 'w' )
 
-    file_entries.append( 'from CRABClient.UserUtilities import config' )
-    file_entries.append( 'config = config()' )
-    file_entries.append( '' )
-    file_entries.append( 'config.General.requestName = "production_%s_%s"' %( options.version, base_name ) )
-    file_entries.append( 'config.General.workArea = "crab_projects" ' )
-    file_entries.append( 'config.General.transferOutputs = True' )
-    file_entries.append( 'config.General.transferLogs = False' )
-    file_entries.append( '' )
-    file_entries.append( 'config.JobType.pluginName = "Analysis"' )
-    file_entries.append( 'config.JobType.psetName = "src/UMDNTuple/UMDNTuple/run_production_cfg.py"' )
-    file_entries.append( 'config.JobType.pyCfgParams = ["isMC=0", "year=%s"]' %options.year )
-    file_entries.append( '' )
-    file_entries.append( 'config.Data.inputDataset = "%s"' %path )
-    file_entries.append( 'config.Data.splitting = "LumiBased"' )
-    file_entries.append( 'config.Data.unitsPerJob = 100' )
-    file_entries.append( 'config.Data.outLFNDirBase = "%s"' %options.outputPath)
-    file_entries.append( 'config.Data.publication = False' )
-    file_entries.append( 'config.Data.outputDatasetTag = "UMDNTuple_%s_%s"' %(options.version, options.year) )
-    file_entries.append( 'config.Data.lumiMask = "%s"' %json_path)
-    file_entries.append( '' )
-    file_entries.append( 'config.Site.storageSite = "%s"' %options.site )
-    #file_entries.append('config.JobType.allowUndistributedCMSSW = True')
+        file_entries = []
 
-    for line in file_entries :
-        ofile.write( line + '\n' )
+        file_entries.append( 'from CRABClient.UserUtilities import config' )
+        file_entries.append( 'config = config()' )
+        file_entries.append( '' )
+        file_entries.append( 'config.General.requestName = "production_data_%s_%s"' %( options.version, base_name ) )
+        file_entries.append( 'config.General.workArea = "crab_projects" ' )
+        file_entries.append( 'config.General.transferOutputs = True' )
+        file_entries.append( 'config.General.transferLogs = False' )
+        file_entries.append( '' )
+        file_entries.append( 'config.JobType.pluginName = "Analysis"' )
+        file_entries.append( 'config.JobType.psetName = "src/UMDNTuple/UMDNTuple/run_production_cfg.py"' )
+        file_entries.append( 'config.JobType.pyCfgParams = ["isMC=0", "year=%s"]' %options.year )
+        file_entries.append( '' )
+        file_entries.append( 'config.Data.inputDataset = "%s"' %path )
+        file_entries.append( 'config.Data.splitting = "LumiBased"' )
+        file_entries.append( 'config.Data.unitsPerJob = 100' )
+        file_entries.append( 'config.Data.outLFNDirBase = "%s"' %options.outputPath)
+        file_entries.append( 'config.Data.publication = False' )
+        file_entries.append( 'config.Data.outputDatasetTag = "UMDNTuple_%s_%s"' %(options.version, options.year) )
+        file_entries.append( 'config.Data.lumiMask = "%s"' %json_path)
+        file_entries.append( '' )
+        file_entries.append( 'config.Site.storageSite = "%s"' %options.site )
+        file_entries.append('config.JobType.allowUndistributedCMSSW = True')
 
-    ofile.close()
+        for line in file_entries :
+            ofile.write( line + '\n' )
 
-    submit_commands.append( 'crab submit --config %s' %( fname ) )
+        ofile.close()
+
+        submit_commands.append( 'crab submit --config %s' %( fname ) )
 
 
 
+if "All" in options.dtype or "Signal" in options.dtype:
+    for path in signal_samples:
 
+        processed = path.split('/')[2]
+        if '_ext' in processed:
+            ext = 'ext' + processed.rsplit('_ext', 1)[1]
+        else:
+            ext = processed.rsplit('-', 1)[1]
+        base_name = path.split('/')[1] + '_' + ext
 
-for path in mc_samples:
+        fname = '%s/%s.py'%(config_dir, base_name)
 
-    processed = path.split('/')[2]
-    if '_ext' in processed:
-        ext = 'ext' + processed.rsplit('_ext', 1)[1]
-    else:
-        ext = processed.rsplit('-', 1)[1]
-    base_name = path.split('/')[1] + '_' + ext
+        ofile = open(fname, 'w' )
 
-    fname = '%s/%s.py'%(config_dir, base_name)
+        file_entries = []
 
-    ofile = open(fname, 'w' )
-
-    file_entries = []
-
-    file_entries.append('from CRABClient.UserUtilities import config')
-    file_entries.append('config = config()')
-    file_entries.append('config.General.workArea = "crab_projects"')
-    file_entries.append('config.General.transferOutputs = True')
-    file_entries.append('config.General.transferLogs = False')
-    file_entries.append('config.JobType.pluginName = "Analysis"')
-    file_entries.append('config.JobType.psetName = "src/UMDNTuple/UMDNTuple/run_production_cfg.py"')
-    file_entries.append('config.Data.outLFNDirBase = "%s"' %options.outputPath)
-    file_entries.append('config.Data.publication = False')
-    file_entries.append('config.Site.storageSite = "%s"' %options.site)
-    file_entries.append('config.Data.outputDatasetTag= "UMDNTuple_%s_%s"' %(options.version,options.year))
-    file_entries.append('config.JobType.pyCfgParams = ["isMC=1","year=%s"]' %(options.year))
-    file_entries.append('config.General.requestName = "production_%s_%s_%s"' %(options.version, base_name, options.year))
-    file_entries.append('config.Data.inputDataset = "%s"' %path)
-    file_entries.append('config.JobType.allowUndistributedCMSSW = True')
-    if "DY" in path :
+        file_entries.append('from CRABClient.UserUtilities import config')
+        file_entries.append('config = config()')
+        file_entries.append('config.General.workArea = "crab_projects"')
+        file_entries.append('config.General.transferOutputs = True')
+        file_entries.append('config.General.transferLogs = False')
+        file_entries.append('config.JobType.pluginName = "Analysis"')
+        file_entries.append('config.JobType.psetName = "src/UMDNTuple/UMDNTuple/run_production_cfg.py"')
+        file_entries.append('config.Data.outLFNDirBase = "%s"' %options.outputPath)
+        file_entries.append('config.Data.publication = False')
+        file_entries.append('config.Site.storageSite = "%s"' %options.site)
+        file_entries.append('config.Data.outputDatasetTag= "UMDNTuple_%s_%s"' %(options.version,options.year))
+        file_entries.append('config.JobType.pyCfgParams = ["isMC=1","year=%s"]' %(options.year))
+        file_entries.append('config.General.requestName = "production_signal_%s_%s_%s"' %(options.version, base_name, options.year))
+        file_entries.append('config.Data.inputDataset = "%s"' %path)
+        file_entries.append('config.JobType.allowUndistributedCMSSW = True')
         file_entries.append('config.Data.splitting = "FileBased"')
-        file_entries.append('config.Data.unitsPerJob = 5') ##no. files per job
-    elif  "Resonance" in path:
-        file_entries.append('config.Data.splitting = "FileBased"')
-        file_entries.append('config.Data.unitsPerJob = 50') ##no. files per job
-    else:
-        file_entries.append('config.Data.splitting = "Automatic"')
-        file_entries.append('config.Data.unitsPerJob = 200')
+        file_entries.append('config.Data.unitsPerJob = 100') ##no. files per job
 
-    for line in file_entries : 
-        ofile.write( line + '\n' )
+        for line in file_entries : 
+            ofile.write( line + '\n' )
 
-    ofile.close()
+        ofile.close()
 
-    submit_commands.append( 'crab submit --config %s' %( fname ) )
+        submit_commands.append( 'crab submit --config %s' %( fname ) )
+
+
+if "All" in options.dtype or "MC" in options.dtype:
+    for path in mc_samples:
+
+        processed = path.split('/')[2]
+        if '_ext' in processed:
+            ext = 'ext' + processed.rsplit('_ext', 1)[1]
+        else:
+            ext = processed.rsplit('-', 1)[1]
+        base_name = path.split('/')[1] + '_' + ext
+
+        fname = '%s/%s.py'%(config_dir, base_name)
+
+        ofile = open(fname, 'w' )
+
+        file_entries = []
+
+        file_entries.append('from CRABClient.UserUtilities import config')
+        file_entries.append('config = config()')
+        file_entries.append('config.General.workArea = "crab_projects"')
+        file_entries.append('config.General.transferOutputs = True')
+        file_entries.append('config.General.transferLogs = False')
+        file_entries.append('config.JobType.pluginName = "Analysis"')
+        file_entries.append('config.JobType.psetName = "src/UMDNTuple/UMDNTuple/run_production_cfg.py"')
+        file_entries.append('config.Data.outLFNDirBase = "%s"' %options.outputPath)
+        file_entries.append('config.Data.publication = False')
+        file_entries.append('config.Site.storageSite = "%s"' %options.site)
+        file_entries.append('config.Data.outputDatasetTag= "UMDNTuple_%s_%s"' %(options.version,options.year))
+        file_entries.append('config.JobType.pyCfgParams = ["isMC=1","year=%s"]' %(options.year))
+        file_entries.append('config.General.requestName = "production_mc_%s_%s_%s"' %(options.version, base_name, options.year))
+        file_entries.append('config.Data.inputDataset = "%s"' %path)
+        file_entries.append('config.JobType.allowUndistributedCMSSW = True')
+        if "DY" in path:
+            file_entries.append('config.Data.splitting = "FileBased"')
+            file_entries.append('config.Data.unitsPerJob = 5') ##no. files per job
+            file_entries.append('config.JobType.maxJobRuntimeMin = 2500')
+        else:
+            file_entries.append('config.Data.splitting = "Automatic"')
+            file_entries.append('config.Data.unitsPerJob = 1500')
+
+        for line in file_entries : 
+            ofile.write( line + '\n' )
+
+        ofile.close()
+
+        submit_commands.append( 'crab submit --config %s' %( fname ) )
 
 
 submit_file = open('submit_crab.sh', 'w' )
