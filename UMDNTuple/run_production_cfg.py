@@ -36,10 +36,12 @@ opt.inputFiles = [
     #'root://cms-xrd-global.cern.ch//store/data/Run2016G/SingleElectron/MINIAOD/23Sep2016-v1/100000/004A7893-A990-E611-B29F-002590E7DE36.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2016G/SingleElectron/MINIAOD/03Feb2017-v1/50000/004A75AB-B2EA-E611-B000-24BE05CEFDF1.root',
     #'/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14_ext3-v1/30000/00026C15-20DF-E911-ACFB-FA163E388F2A.root'
-    '/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/100000/005FEC6C-D6C2-E811-A83B-A0369FC5E094.root'
+    # '/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/100000/005FEC6C-D6C2-E811-A83B-A0369FC5E094.root'
     #'/store/mc/RunIISummer16MiniAODv3/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v2/80000/FC17F3AA-4BEF-E811-82FA-0CC47AC52D6A.root'
 #    '/store/data/Run2016H/SingleElectron/MINIAOD/17Jul2018-v1/20000/E4F33560-978D-E811-AAF8-0CC47A01035C.root'
     #'/store/mc/RunIISummer16MiniAODv3/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2/60000/1C6659CD-F5E4-E811-BFA6-E0071B73C600.root'
+    '/store/mc/RunIIFall17MiniAODv2/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/00000/0037F121-7BB9-E811-A732-0242AC130002.root',
+    # '/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/8C747979-A6BE-E611-8850-D48564593FD8.root',
 ]
 
 
@@ -605,6 +607,22 @@ process.p += process.ecalBadCalibReducedMINIAODFilter
 
 # prefiring weight
 if opt.isMC and opt.year in ['2016','2017']: process.p += process.prefiringweight
+
+# 2017 EE noise mitigation
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#Instructions_for_2017_data_with
+
+if opt.year == '2017':
+  from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+
+  runMetCorAndUncFromMiniAOD (
+          process,
+          isData = not opt.isMC, # false for MC
+          fixEE2017 = True,
+          fixEE2017Params = {'userawPt': True, 'ptThreshold':50.0, 'minEtaThreshold':2.65, 'maxEtaThreshold': 3.139} ,
+          postfix = "ModifiedMET"
+  )
+  process.p += process.fullPatMetSequenceModifiedMET
+  process.UMDNTuple.metTag = 'slimmedMETsModifiedMET'
 
 #if opt.year == '2016': 
 #    from RecoMET.METPUSubtraction.deepMETProducer_cfi import deepMETProducer
