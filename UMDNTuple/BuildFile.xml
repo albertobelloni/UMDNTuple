@@ -1,4 +1,3 @@
-<flags CPPDEFINES="MYFILE_CHECKSUM=$$(shell git hash-object $$< | sed 's| .*||')"/>
 <use name="DataFormats/EgammaCandidates"/>
 <use name="DataFormats/Common"/>
 <use name="RecoEgamma/EgammaTools"/>
