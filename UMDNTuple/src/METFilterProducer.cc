@@ -43,12 +43,6 @@ void METFilterProducer::initialize( const std::string &prefix,
 
 }
 
-void METFilterProducer::addBadChargedCandidateFilterToken( const edm::EDGetTokenT<bool> & tok)  { 
-    _BadChCandFilterToken = tok;
-}
-void METFilterProducer::addBadPFMuonFilterToken( const edm::EDGetTokenT<bool> & tok)  { 
-    _BadPFMuonFilterToken = tok;
-}
 void METFilterProducer::addecalBadCalibReducedMINIAODFilterToken( const edm::EDGetTokenT<bool> & tok)  { 
     _ecalBadCalibReducedMINIAODFilterToken = tok;
 }
@@ -92,16 +86,6 @@ void METFilterProducer::produce(const edm::Event &iEvent ) {
     // check that they were requested in the list and get the ID
     for( std::map<std::string,int>::const_iterator mitr = _filter_map.begin();
             mitr != _filter_map.end(); ++mitr ) {
-        if( mitr->first == "Flag_BadChargedCandidateFilter" ) {
-            edm::Handle<bool> ifilterbadChCand;
-            iEvent.getByToken(_BadChCandFilterToken, ifilterbadChCand);
-            if( *ifilterbadChCand ) _passing_filters->push_back( mitr->second );
-        }
-        if( mitr->first == "Flag_BadPFMuonFilter" ) {
-            edm::Handle<bool> ifilterbadPFMuon;
-            iEvent.getByToken(_BadPFMuonFilterToken, ifilterbadPFMuon);
-            if( *ifilterbadPFMuon ) _passing_filters->push_back( mitr->second );
-        }
         if( mitr->first == "Flag_ecalBadCalibReducedMINIAODFilter" ) {
             edm::Handle<bool> ifilterecalBadCalib;
             iEvent.getByToken(_ecalBadCalibReducedMINIAODFilterToken, ifilterecalBadCalib);

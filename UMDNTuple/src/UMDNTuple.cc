@@ -364,12 +364,6 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
         metFilterToken = consumes<edm::TriggerResults>(
                     iConfig.getUntrackedParameter<edm::InputTag>("metFilterTag"));
 
-        edm::EDGetTokenT<bool> BadChCandFilterToken = 
-            consumes<bool>(iConfig.getUntrackedParameter<edm::InputTag>("BadChargedCandidateFilter"));
-
-        edm::EDGetTokenT<bool> BadPFMuonFilterToken = 
-            consumes<bool>(iConfig.getUntrackedParameter<edm::InputTag>("BadPFMuonFilter"));
-
         edm::EDGetTokenT<bool> ecalBadCalibReducedMINIAODFilterToken =
             consumes<bool>(iConfig.getUntrackedParameter<edm::InputTag>("ecalBadCalibReducedMINIAODFilter"));
 
@@ -379,8 +373,6 @@ UMDNTuple::UMDNTuple( const edm::ParameterSet & iConfig ) :
         _metFilterProducer .initialize( prefix_met_filter , metFilterToken , 
                                         filter_map, _myTree, _filterInfoTree );
 
-        _metFilterProducer.addBadChargedCandidateFilterToken( BadChCandFilterToken );
-        _metFilterProducer.addBadPFMuonFilterToken( BadPFMuonFilterToken );
         _metFilterProducer.addecalBadCalibReducedMINIAODFilterToken( ecalBadCalibReducedMINIAODFilterToken );
     }
     if( _produceTrig ) {
