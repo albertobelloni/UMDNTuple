@@ -20,8 +20,6 @@ class METFilterProducer {
                          TTree *, TTree* );
 
         void produce(const edm::Event &iEvent );
-        void addBadChargedCandidateFilterToken( const edm::EDGetTokenT<bool> &);
-        void addBadPFMuonFilterToken( const edm::EDGetTokenT<bool> &);
         void addecalBadCalibReducedMINIAODFilterToken( const edm::EDGetTokenT<bool> &);
         void endRun( );
 
@@ -31,8 +29,6 @@ class METFilterProducer {
         std::string _prefix;
 
         edm::EDGetTokenT<edm::TriggerResults> _filterToken;
-        edm::EDGetTokenT<bool> _BadChCandFilterToken;
-        edm::EDGetTokenT<bool> _BadPFMuonFilterToken;
         edm::EDGetTokenT<bool> _ecalBadCalibReducedMINIAODFilterToken;
 
         std::map<std::string, int> _filter_map;

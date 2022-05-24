@@ -107,19 +107,6 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 # Load additional MET Filters
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#How_to_run_the_Bad_Charged_Hadro
 
-process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
-process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
-process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-process.BadPFMuonFilter.taggingMode = cms.bool( True )
-
-process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
-process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
-process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-process.BadChargedCandidateFilter.taggingMode = cms.bool( True )
-
-
-
-
 process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 baddetEcallist = cms.vuint32(
 [872439604,872422825,872420274,872423218,872423215,872416066,872435036,872439336,
@@ -540,8 +527,6 @@ process.UMDNTuple = cms.EDAnalyzer("UMDNTuple",
     triggerObjTag = cms.untracked.InputTag('slimmedPatTrigger'),
     triggerMap = trigger_map,
     metFilterTag  = cms.untracked.InputTag('TriggerResults', '', 'PAT') if opt.isMC else cms.untracked.InputTag('TriggerResults', '', 'RECO'),
-    BadChargedCandidateFilter = cms.untracked.InputTag('BadChargedCandidateFilter'),
-    BadPFMuonFilter = cms.untracked.InputTag('BadPFMuonFilter'),
     ecalBadCalibReducedMINIAODFilter = cms.untracked.InputTag('ecalBadCalibReducedMINIAODFilter'),
     metFilterMap = filter_map,
 
@@ -601,8 +586,6 @@ process.p = cms.Path()
 #process.p += process.selectedElectrons
 process.p += process.egammaPostRecoSeq
 # run additional MET filters
-process.p += process.BadPFMuonFilter
-process.p += process.BadChargedCandidateFilter
 process.p += process.ecalBadCalibReducedMINIAODFilter
 
 # prefiring weight
